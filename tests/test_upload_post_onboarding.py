@@ -17,7 +17,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -48,8 +48,8 @@ def _install_fake_upload_post(monkeypatch, resp):
 class TestUrlExtraction:
     @pytest.mark.asyncio
     async def test_flat_access_url(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -64,8 +64,8 @@ class TestUrlExtraction:
 
     @pytest.mark.asyncio
     async def test_flat_url_key(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -78,8 +78,8 @@ class TestUrlExtraction:
 
     @pytest.mark.asyncio
     async def test_nested_data_shape(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -93,8 +93,8 @@ class TestUrlExtraction:
 
     @pytest.mark.asyncio
     async def test_no_url_in_response_raises(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -108,8 +108,8 @@ class TestUrlExtraction:
         """A token-only string (no scheme) would let the client open a bad
         thing if we handed it back — reject anything that doesn't look like
         an http(s) URL."""
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -122,8 +122,8 @@ class TestUrlExtraction:
 class TestValidation:
     @pytest.mark.asyncio
     async def test_missing_username_raises(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -133,8 +133,8 @@ class TestValidation:
 
     @pytest.mark.asyncio
     async def test_missing_api_key_raises(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "")
         cfg.settings.cache_clear()
@@ -144,8 +144,8 @@ class TestValidation:
 
     @pytest.mark.asyncio
     async def test_unsupported_platform_raises(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -161,8 +161,8 @@ class TestOptionalKwargsPropagate:
     async def test_only_set_kwargs_reach_sdk(self, monkeypatch):
         """Nones must be stripped so they don't override Upload-Post defaults
         and the SDK receives a clean minimal kwargs dict."""
-        from glitch_signal import config as cfg
-        from glitch_signal.onboarding.upload_post import generate_onboarding_url
+        from social_signal import config as cfg
+        from social_signal.onboarding.upload_post import generate_onboarding_url
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()

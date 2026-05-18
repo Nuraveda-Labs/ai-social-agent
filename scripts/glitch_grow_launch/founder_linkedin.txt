@@ -12,6 +12,6 @@ The lesson I keep landing on: full autonomy on money decisions is too risky when
 
 Full breakdown in the carousel below.
 
-gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent
+gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-ads-agent
 
 #buildinpublic #ecommerce #founder #adsops

@@ -32,13 +32,13 @@ sys.path.insert(0, str(ROOT / "src"))
 
 import asyncio  # noqa: E402
 
-from glitch_signal.config import settings  # noqa: E402
-from glitch_signal.integrations.google_sheets import (  # noqa: E402
+from social_signal.config import settings  # noqa: E402
+from social_signal.integrations.google_sheets import (  # noqa: E402
     _service,
     append_row,
     ensure_header,
 )
-from glitch_signal.sheet_posting.reader import SHEET_COLUMNS  # noqa: E402
+from social_signal.sheet_posting.reader import SHEET_COLUMNS  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Seed content — drafted against the actual work Tejas has shipped.
@@ -47,7 +47,7 @@ from glitch_signal.sheet_posting.reader import SHEET_COLUMNS  # noqa: E402
 # No fabricated metrics. Char limits enforced on X (≤ 280).
 # ---------------------------------------------------------------------------
 
-_GH_LINK = "github.com/glitch-exec-labs"
+_GH_LINK = "github.com/<your-org>"
 
 SEED_POSTS: list[dict[str, str]] = [
     # ====================================================================

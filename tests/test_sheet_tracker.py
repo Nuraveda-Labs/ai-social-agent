@@ -22,7 +22,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -49,8 +49,8 @@ def _write_brand(configs_dir, brand_id, sheet_block=None):
 
 class TestSheetTarget:
     def test_returns_sheet_when_configured(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations.sheet_tracker import sheet_target
+        from social_signal import config as cfg
+        from social_signal.integrations.sheet_tracker import sheet_target
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -63,8 +63,8 @@ class TestSheetTarget:
         assert sheet_target("b") == ("SHEET-123", "Posts")
 
     def test_default_worksheet(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations.sheet_tracker import sheet_target
+        from social_signal import config as cfg
+        from social_signal.integrations.sheet_tracker import sheet_target
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -77,8 +77,8 @@ class TestSheetTarget:
         assert sheet_target("b") == ("SHEET-123", "Sheet1")
 
     def test_returns_none_when_unconfigured(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations.sheet_tracker import sheet_target
+        from social_signal import config as cfg
+        from social_signal.integrations.sheet_tracker import sheet_target
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -94,8 +94,8 @@ class TestSheetTarget:
 class TestAppendNewVideo:
     @pytest.mark.asyncio
     async def test_appends_row_with_parsed_fields(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations import sheet_tracker
+        from social_signal import config as cfg
+        from social_signal.integrations import sheet_tracker
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -112,7 +112,7 @@ class TestAppendNewVideo:
             captured["columns"] = columns
             captured["row"] = row
         monkeypatch.setattr(
-            "glitch_signal.integrations.sheet_tracker.gs.append_row", fake_append
+            "social_signal.integrations.sheet_tracker.gs.append_row", fake_append
         )
 
         await sheet_tracker.append_new_video(
@@ -130,8 +130,8 @@ class TestAppendNewVideo:
 
     @pytest.mark.asyncio
     async def test_noop_when_sheet_not_configured(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations import sheet_tracker
+        from social_signal import config as cfg
+        from social_signal.integrations import sheet_tracker
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -144,7 +144,7 @@ class TestAppendNewVideo:
         async def must_not_run(*a, **kw):
             raise AssertionError("append_row must not be called when no sheet configured")
         monkeypatch.setattr(
-            "glitch_signal.integrations.sheet_tracker.gs.append_row", must_not_run
+            "social_signal.integrations.sheet_tracker.gs.append_row", must_not_run
         )
         # Should complete silently.
         await sheet_tracker.append_new_video(
@@ -153,8 +153,8 @@ class TestAppendNewVideo:
 
     @pytest.mark.asyncio
     async def test_swallows_api_error(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations import sheet_tracker
+        from social_signal import config as cfg
+        from social_signal.integrations import sheet_tracker
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -167,7 +167,7 @@ class TestAppendNewVideo:
         async def boom(*a, **kw):
             raise RuntimeError("sheets 500")
         monkeypatch.setattr(
-            "glitch_signal.integrations.sheet_tracker.gs.append_row", boom
+            "social_signal.integrations.sheet_tracker.gs.append_row", boom
         )
         # Must NOT raise — scout should never fail on sheets outage.
         await sheet_tracker.append_new_video(
@@ -178,8 +178,8 @@ class TestAppendNewVideo:
 class TestUpdateByVideoName:
     @pytest.mark.asyncio
     async def test_delegates_to_update_row_by_key(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations import sheet_tracker
+        from social_signal import config as cfg
+        from social_signal.integrations import sheet_tracker
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -198,7 +198,7 @@ class TestUpdateByVideoName:
             })
             return True
         monkeypatch.setattr(
-            "glitch_signal.integrations.sheet_tracker.gs.update_row_by_key", fake_update
+            "social_signal.integrations.sheet_tracker.gs.update_row_by_key", fake_update
         )
 
         ok = await sheet_tracker.update_by_video_name(
@@ -212,8 +212,8 @@ class TestUpdateByVideoName:
 
     @pytest.mark.asyncio
     async def test_returns_false_when_no_sheet(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.integrations import sheet_tracker
+        from social_signal import config as cfg
+        from social_signal.integrations import sheet_tracker
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -232,5 +232,5 @@ class TestColLetter:
         (1, "A"), (26, "Z"), (27, "AA"), (52, "AZ"), (53, "BA"),
     ])
     def test_col_letter(self, n, letter):
-        from glitch_signal.integrations.google_sheets import _col_letter
+        from social_signal.integrations.google_sheets import _col_letter
         assert _col_letter(n) == letter

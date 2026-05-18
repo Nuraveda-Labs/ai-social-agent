@@ -75,9 +75,9 @@ dependencies = [
   # img2pdf — lossless PNG→PDF for LinkedIn carousel document posts.
   "img2pdf>=0.5",
 
-  # Upload-Post — forked to glitch-exec-labs/upload-post-pip so we can
+  # Upload-Post — forked to <your-org>/upload-post-pip so we can
   # track upstream releases and patch LinkedIn document support as needed.
-  "upload-post @ git+https://gitlab.com/glitch-grow/ai-social-agent.git@main",
+  "upload-post @ git+https://gitlab.com/ai-marketing-stack/ai-social-agent.git@main",
 ]
 
 [project.optional-dependencies]
@@ -100,8 +100,8 @@ dev = [
 #   TypeError: URL `dependencies` of field `project.urls` must be a string
 [project.urls]
 Homepage = "https://example.com"
-Repository = "https://gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-social-media-agent"
-Issues = "https://gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-social-media-agent/issues"
+Repository = "https://gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-social-media-agent"
+Issues = "https://gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-social-media-agent/issues"
 
 [build-system]
 requires = ["hatchling"]
@@ -109,12 +109,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
 # Required because we pin `upload-post` to our fork via a git URL
-# (git+https://gitlab.com/glitch-grow/ai-social-agent). Hatchling refuses
+# (git+https://gitlab.com/ai-marketing-stack/ai-social-agent). Hatchling refuses
 # direct URL dependencies unless this is explicitly allowed.
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/glitch_signal"]
+packages = ["src/social_signal"]
 
 [tool.ruff]
 line-length = 100

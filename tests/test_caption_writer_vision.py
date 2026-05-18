@@ -19,7 +19,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -61,8 +61,8 @@ class TestModeRouting:
 
     @pytest.mark.asyncio
     async def test_filename_mode_skips_vision(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -93,8 +93,8 @@ class TestModeRouting:
 
     @pytest.mark.asyncio
     async def test_vision_mode_runs_vision_path(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -138,8 +138,8 @@ class TestModeRouting:
     ):
         """If the local file somehow isn't on disk, vision path is skipped and
         we use filename mode rather than raising."""
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -172,8 +172,8 @@ class TestVisionFallback:
     async def test_vision_exception_falls_back_to_filename(
         self, tmp_path, monkeypatch
     ):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -205,8 +205,8 @@ class TestVisionFallback:
     async def test_vision_exception_propagates_when_fallback_disabled(
         self, tmp_path, monkeypatch
     ):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -304,7 +304,7 @@ class TestGenerateViaVisionSDK:
 
     @pytest.mark.asyncio
     async def test_active_on_first_check_happy_path(self, tmp_path, monkeypatch):
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"xyz")
@@ -324,7 +324,7 @@ class TestGenerateViaVisionSDK:
     @pytest.mark.asyncio
     async def test_processing_then_active_polls(self, tmp_path, monkeypatch):
         """Upload returns PROCESSING once → we should poll get until ACTIVE."""
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"xyz")
@@ -343,7 +343,7 @@ class TestGenerateViaVisionSDK:
 
     @pytest.mark.asyncio
     async def test_file_api_failed_raises(self, tmp_path, monkeypatch):
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"xyz")
@@ -356,7 +356,7 @@ class TestGenerateViaVisionSDK:
 
     @pytest.mark.asyncio
     async def test_model_override_is_passed(self, tmp_path, monkeypatch):
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"xyz")
@@ -374,7 +374,7 @@ class TestGenerateViaVisionSDK:
     ):
         """If generate_content raises, files.delete must still run so we don't
         pile up orphan uploads on Gemini's side."""
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"xyz")
@@ -408,8 +408,8 @@ class TestGenerateViaVisionSDK:
 
     @pytest.mark.asyncio
     async def test_missing_api_key_raises(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         monkeypatch.setenv("GOOGLE_API_KEY", "")
         cfg.settings.cache_clear()

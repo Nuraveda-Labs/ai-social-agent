@@ -18,7 +18,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -40,16 +40,16 @@ def _write_brand(configs_dir: pathlib.Path, brand_id: str, media_pipeline: dict 
 
 class TestCanonicalPlatform:
     def test_upload_post_prefix_stripped(self):
-        from glitch_signal.media.ffmpeg import canonical_platform
+        from social_signal.media.ffmpeg import canonical_platform
         assert canonical_platform("upload_post_tiktok") == "tiktok"
         assert canonical_platform("upload_post_instagram") == "instagram"
 
     def test_zernio_prefix_stripped(self):
-        from glitch_signal.media.ffmpeg import canonical_platform
+        from social_signal.media.ffmpeg import canonical_platform
         assert canonical_platform("zernio_tiktok") == "tiktok"
 
     def test_direct_keys_stable(self):
-        from glitch_signal.media.ffmpeg import canonical_platform
+        from social_signal.media.ffmpeg import canonical_platform
         assert canonical_platform("tiktok") == "tiktok"
         assert canonical_platform("youtube_shorts") == "youtube"
         assert canonical_platform("instagram_reels") == "instagram"
@@ -60,7 +60,7 @@ class TestApplyTransformsNoOp:
 
     @pytest.mark.asyncio
     async def test_unknown_brand_returns_input(self, tmp_path, monkeypatch):
-        from glitch_signal.media.ffmpeg import apply_transforms
+        from social_signal.media.ffmpeg import apply_transforms
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"x")
         out = await apply_transforms(str(vid), "does_not_exist", "upload_post_tiktok")
@@ -68,8 +68,8 @@ class TestApplyTransformsNoOp:
 
     @pytest.mark.asyncio
     async def test_no_media_pipeline_returns_input(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media.ffmpeg import apply_transforms
+        from social_signal import config as cfg
+        from social_signal.media.ffmpeg import apply_transforms
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -86,8 +86,8 @@ class TestApplyTransformsNoOp:
 
     @pytest.mark.asyncio
     async def test_platform_not_in_pipeline_returns_input(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media.ffmpeg import apply_transforms
+        from social_signal import config as cfg
+        from social_signal.media.ffmpeg import apply_transforms
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -105,7 +105,7 @@ class TestApplyTransformsNoOp:
 
     @pytest.mark.asyncio
     async def test_empty_brand_id_returns_input(self, tmp_path):
-        from glitch_signal.media.ffmpeg import apply_transforms
+        from social_signal.media.ffmpeg import apply_transforms
         vid = tmp_path / "clip.mp4"
         vid.write_bytes(b"x")
         out = await apply_transforms(str(vid), "", "upload_post_tiktok")
@@ -116,7 +116,7 @@ class TestStripAudioBuilder:
     """The argv builder is pure — verify the shape without invoking ffmpeg."""
 
     def test_strip_audio_argv(self, tmp_path):
-        from glitch_signal.media.ffmpeg import _strip_audio
+        from social_signal.media.ffmpeg import _strip_audio
         src = tmp_path / "in.mp4"
         dst = tmp_path / "in.strip_audio.mp4"
         argv = _strip_audio(src, dst, {})
@@ -134,7 +134,7 @@ class TestReplaceAudioBuilder:
     """Verify the replace_audio argv without invoking ffmpeg."""
 
     def test_replace_audio_argv(self, tmp_path):
-        from glitch_signal.media.ffmpeg import _replace_audio
+        from social_signal.media.ffmpeg import _replace_audio
         src = tmp_path / "in.mp4"
         dst = tmp_path / "in.replace_audio.mp4"
         audio = tmp_path / "bgm.mp3"
@@ -158,21 +158,21 @@ class TestReplaceAudioBuilder:
         assert "-shortest" in argv
 
     def test_replace_audio_requires_audio_path(self, tmp_path):
-        from glitch_signal.media.ffmpeg import _replace_audio
+        from social_signal.media.ffmpeg import _replace_audio
         src = tmp_path / "in.mp4"
         dst = tmp_path / "in.replace_audio.mp4"
         with pytest.raises(ValueError, match="audio_path"):
             _replace_audio(src, dst, {})
 
     def test_replace_audio_missing_file_raises(self, tmp_path):
-        from glitch_signal.media.ffmpeg import _replace_audio
+        from social_signal.media.ffmpeg import _replace_audio
         src = tmp_path / "in.mp4"
         dst = tmp_path / "in.replace_audio.mp4"
         with pytest.raises(FileNotFoundError):
             _replace_audio(src, dst, {"audio_path": str(tmp_path / "nope.mp3")})
 
     def test_replace_audio_custom_bitrate(self, tmp_path):
-        from glitch_signal.media.ffmpeg import _replace_audio
+        from social_signal.media.ffmpeg import _replace_audio
         src = tmp_path / "in.mp4"
         dst = tmp_path / "in.replace_audio.mp4"
         audio = tmp_path / "bgm.mp3"
@@ -183,22 +183,22 @@ class TestReplaceAudioBuilder:
 
 class TestParseEntry:
     def test_string_entry(self):
-        from glitch_signal.media.ffmpeg import _parse_entry
+        from social_signal.media.ffmpeg import _parse_entry
         assert _parse_entry("strip_audio") == ("strip_audio", {})
 
     def test_dict_entry_splits_name_from_options(self):
-        from glitch_signal.media.ffmpeg import _parse_entry
+        from social_signal.media.ffmpeg import _parse_entry
         name, opts = _parse_entry({"name": "replace_audio", "audio_path": "x.mp3"})
         assert name == "replace_audio"
         assert opts == {"audio_path": "x.mp3"}
 
     def test_dict_entry_missing_name(self):
-        from glitch_signal.media.ffmpeg import _parse_entry
+        from social_signal.media.ffmpeg import _parse_entry
         with pytest.raises(ValueError, match="name"):
             _parse_entry({"audio_path": "x.mp3"})
 
     def test_bad_entry_type(self):
-        from glitch_signal.media.ffmpeg import _parse_entry
+        from social_signal.media.ffmpeg import _parse_entry
         with pytest.raises(ValueError):
             _parse_entry(123)
 
@@ -206,8 +206,8 @@ class TestParseEntry:
 class TestApplyTransformsReplaceAudio:
     @pytest.mark.asyncio
     async def test_dict_entry_passes_options_through(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -247,8 +247,8 @@ class TestApplyTransformsReplaceAudio:
 class TestApplyTransformsRuns:
     @pytest.mark.asyncio
     async def test_invokes_ffmpeg_and_returns_output_path(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -283,8 +283,8 @@ class TestApplyTransformsRuns:
     @pytest.mark.asyncio
     async def test_cache_hit_skips_ffmpeg(self, tmp_path, monkeypatch):
         """Second call with the same input file must not invoke ffmpeg again."""
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -309,8 +309,8 @@ class TestApplyTransformsRuns:
 
     @pytest.mark.asyncio
     async def test_missing_input_file_raises(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -327,8 +327,8 @@ class TestApplyTransformsRuns:
 
     @pytest.mark.asyncio
     async def test_unknown_transform_name_raises(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -352,8 +352,8 @@ class TestCanonicalRouting:
 
     @pytest.mark.asyncio
     async def test_zernio_tiktok_hits_tiktok_pipeline(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -378,8 +378,8 @@ class TestCanonicalRouting:
 
     @pytest.mark.asyncio
     async def test_direct_tiktok_hits_tiktok_pipeline(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal import config as cfg
+        from social_signal.media import ffmpeg as mod
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -409,7 +409,7 @@ class TestFfmpegErrorPropagation:
         """_run_ffmpeg must surface ffmpeg stderr when the binary exits nonzero."""
         import subprocess
 
-        from glitch_signal.media import ffmpeg as mod
+        from social_signal.media import ffmpeg as mod
 
         class _FakeResult:
             returncode = 1

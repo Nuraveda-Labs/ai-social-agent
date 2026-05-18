@@ -24,7 +24,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -41,8 +41,8 @@ async def _build_test_db():
         await conn.run_sync(SQLModel.metadata.create_all)
     factory = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-    import glitch_signal.db.session as db_session
-    import glitch_signal.scheduler.queue as q
+    import social_signal.db.session as db_session
+    import social_signal.scheduler.queue as q
 
     def _getter():
         return factory
@@ -63,7 +63,7 @@ async def _seed_sp(
     factory, *, brand_id: str, status: str,
     last_attempt_at: datetime, asset_required: bool = True,
 ):
-    from glitch_signal.db.models import ScheduledPost, VideoAsset
+    from social_signal.db.models import ScheduledPost, VideoAsset
 
     asset_id = str(uuid.uuid4())
     sp_id = str(uuid.uuid4())
@@ -89,7 +89,7 @@ class TestCountPostsTodayIncludesInflight:
     async def test_awaiting_webhook_counts_against_cap(self):
         """A ScheduledPost still waiting for its webhook callback MUST
         be counted — otherwise every 30s tick fires another post."""
-        from glitch_signal.scheduler.queue import _count_posts_today
+        from social_signal.scheduler.queue import _count_posts_today
 
         factory, originals = await _build_test_db()
         try:
@@ -107,7 +107,7 @@ class TestCountPostsTodayIncludesInflight:
 
     @pytest.mark.asyncio
     async def test_done_posts_count_too(self):
-        from glitch_signal.scheduler.queue import _count_posts_today
+        from social_signal.scheduler.queue import _count_posts_today
 
         factory, originals = await _build_test_db()
         try:
@@ -126,7 +126,7 @@ class TestCountPostsTodayIncludesInflight:
     async def test_queued_not_counted(self):
         """Posts that haven't been dispatched yet (still `queued` /
         `pending_veto`) must NOT count against today's cap."""
-        from glitch_signal.scheduler.queue import _count_posts_today
+        from social_signal.scheduler.queue import _count_posts_today
 
         factory, originals = await _build_test_db()
         try:
@@ -143,7 +143,7 @@ class TestCountPostsTodayIncludesInflight:
 
     @pytest.mark.asyncio
     async def test_yesterdays_posts_not_counted(self):
-        from glitch_signal.scheduler.queue import _count_posts_today
+        from social_signal.scheduler.queue import _count_posts_today
 
         factory, originals = await _build_test_db()
         try:
@@ -160,7 +160,7 @@ class TestCountPostsTodayIncludesInflight:
 
     @pytest.mark.asyncio
     async def test_other_brands_not_counted(self):
-        from glitch_signal.scheduler.queue import _count_posts_today
+        from social_signal.scheduler.queue import _count_posts_today
 
         factory, originals = await _build_test_db()
         try:
@@ -182,7 +182,7 @@ class TestMinIntervalUsesInflightTimestamp:
         """min_interval must read ScheduledPost.last_attempt_at, not
         PublishedPost.published_at. Otherwise a still-in-flight post
         registers as 'never' and the gate lets the next dispatch through."""
-        from glitch_signal.scheduler.queue import _minutes_since_last_post
+        from social_signal.scheduler.queue import _minutes_since_last_post
 
         factory, originals = await _build_test_db()
         try:
@@ -199,7 +199,7 @@ class TestMinIntervalUsesInflightTimestamp:
 
     @pytest.mark.asyncio
     async def test_returns_none_when_no_history(self):
-        from glitch_signal.scheduler.queue import _minutes_since_last_post
+        from social_signal.scheduler.queue import _minutes_since_last_post
 
         factory, originals = await _build_test_db()
         try:
@@ -213,7 +213,7 @@ class TestMinIntervalUsesInflightTimestamp:
     async def test_queued_ignored(self):
         """A queued post hasn't been dispatched yet; it shouldn't count
         as 'most recent post'."""
-        from glitch_signal.scheduler.queue import _minutes_since_last_post
+        from social_signal.scheduler.queue import _minutes_since_last_post
 
         factory, originals = await _build_test_db()
         try:

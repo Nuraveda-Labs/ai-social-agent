@@ -16,7 +16,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -26,7 +26,7 @@ def _reset_caches():
 
 class TestUploadPostPlatformMap:
     def test_known_platform_keys(self):
-        from glitch_signal.platforms.upload_post import _PLATFORM_MAP
+        from social_signal.platforms.upload_post import _PLATFORM_MAP
         assert _PLATFORM_MAP["upload_post_tiktok"] == "tiktok"
         assert _PLATFORM_MAP["upload_post_instagram"] == "instagram"
         assert _PLATFORM_MAP["upload_post_youtube"] == "youtube"
@@ -35,7 +35,7 @@ class TestUploadPostPlatformMap:
 class TestUploadPostDryRun:
     @pytest.mark.asyncio
     async def test_dry_run_returns_fake_id_no_http(self):
-        from glitch_signal.platforms import upload_post
+        from social_signal.platforms import upload_post
         publish_id, url = await upload_post.publish(
             platform="upload_post_tiktok",
             file_path="/does/not/matter.mp4",
@@ -47,8 +47,8 @@ class TestUploadPostDryRun:
 
     @pytest.mark.asyncio
     async def test_live_rejects_missing_api_key(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import upload_post
+        from social_signal import config
+        from social_signal.platforms import upload_post
 
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "")
@@ -64,8 +64,8 @@ class TestUploadPostDryRun:
 
     @pytest.mark.asyncio
     async def test_live_rejects_unknown_platform_key(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import upload_post
+        from social_signal import config
+        from social_signal.platforms import upload_post
 
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
@@ -82,7 +82,7 @@ class TestUploadPostDryRun:
 
 class TestPlatformExtras:
     def test_tiktok_extras_full_mapping(self):
-        from glitch_signal.platforms.upload_post import _platform_extras
+        from social_signal.platforms.upload_post import _platform_extras
         cfg = {
             "default_privacy_level": "PUBLIC_TO_EVERYONE",
             "disable_duet": True,
@@ -100,18 +100,18 @@ class TestPlatformExtras:
         assert e["is_aigc"] is False
 
     def test_instagram_extras_default_reels(self):
-        from glitch_signal.platforms.upload_post import _platform_extras
+        from social_signal.platforms.upload_post import _platform_extras
         e = _platform_extras("instagram", {})
         assert e["media_type"] == "REELS"
 
     def test_youtube_extras_default_public(self):
-        from glitch_signal.platforms.upload_post import _platform_extras
+        from social_signal.platforms.upload_post import _platform_extras
         e = _platform_extras("youtube", {})
         assert e["privacyStatus"] == "public"
         assert e["categoryId"] == "22"
 
     def test_unknown_target_returns_empty(self):
-        from glitch_signal.platforms.upload_post import _platform_extras
+        from social_signal.platforms.upload_post import _platform_extras
         assert _platform_extras("bluesky", {"anything": 1}) == {}
 
 
@@ -129,7 +129,7 @@ class TestCaptionFieldMapping:
     """
 
     def test_tiktok_caption_goes_into_title(self, monkeypatch):
-        from glitch_signal.platforms import upload_post as up
+        from social_signal.platforms import upload_post as up
 
         captured: dict = {}
 
@@ -159,7 +159,7 @@ class TestCaptionFieldMapping:
         )
 
     def test_instagram_caption_goes_into_title(self, monkeypatch):
-        from glitch_signal.platforms import upload_post as up
+        from social_signal.platforms import upload_post as up
 
         captured: dict = {}
 
@@ -185,7 +185,7 @@ class TestCaptionFieldMapping:
         assert "description" not in captured
 
     def test_youtube_call_includes_title(self, monkeypatch):
-        from glitch_signal.platforms import upload_post as up
+        from social_signal.platforms import upload_post as up
 
         captured: dict = {}
 
@@ -216,8 +216,8 @@ class TestPollStatusForRequest:
 
     @pytest.mark.asyncio
     async def test_finds_post_url_from_results_list(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.platforms import upload_post as up
+        from social_signal import config as cfg
+        from social_signal.platforms import upload_post as up
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -242,8 +242,8 @@ class TestPollStatusForRequest:
 
     @pytest.mark.asyncio
     async def test_in_flight_returns_none(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.platforms import upload_post as up
+        from social_signal import config as cfg
+        from social_signal.platforms import upload_post as up
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -264,8 +264,8 @@ class TestPollStatusForRequest:
 
     @pytest.mark.asyncio
     async def test_platform_error_raises(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.platforms import upload_post as up
+        from social_signal import config as cfg
+        from social_signal.platforms import upload_post as up
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         cfg.settings.cache_clear()
@@ -312,7 +312,7 @@ class TestResolvePublishPlatform:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "drive_brand")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
@@ -329,7 +329,7 @@ class TestResolvePublishPlatform:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "drive_brand")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
@@ -346,7 +346,7 @@ class TestResolvePublishPlatform:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "drive_brand")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
@@ -362,7 +362,7 @@ class TestResolvePublishPlatform:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "drive_brand")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
@@ -375,7 +375,7 @@ class TestPublisherRoutesUploadPost:
 
     @pytest.mark.asyncio
     async def test_routes_upload_post_tiktok(self, monkeypatch):
-        from glitch_signal.agent.nodes import publisher
+        from social_signal.agent.nodes import publisher
 
         captured = {}
 
@@ -385,9 +385,9 @@ class TestPublisherRoutesUploadPost:
             captured["attempts"] = attempts
             return "up-stub-id", "https://www.tiktok.com/@x/video/1"
 
-        monkeypatch.setattr("glitch_signal.platforms.upload_post.publish", fake_publish)
+        monkeypatch.setattr("social_signal.platforms.upload_post.publish", fake_publish)
         monkeypatch.setenv("DISPATCH_MODE", "live")
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
 
         post_id, url = await publisher._publish_to_platform(
@@ -404,8 +404,8 @@ class TestUploadPostRetryShortCircuit:
 
     @pytest.mark.asyncio
     async def test_retry_short_circuits_on_history_hit(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.platforms import upload_post as up
+        from social_signal import config as cfg
+        from social_signal.platforms import upload_post as up
 
         # Brand config with upload_post_tiktok enabled.
         configs = tmp_path / "configs"
@@ -468,8 +468,8 @@ class TestUploadPostRetryShortCircuit:
         NOT a finalized post_id. get_history must NOT be called (history-check
         is a retry-only concern) and get_status must NOT be called (finalization
         happens via webhook, not polling)."""
-        from glitch_signal import config as cfg
-        from glitch_signal.platforms import upload_post as up
+        from social_signal import config as cfg
+        from social_signal.platforms import upload_post as up
 
         configs = tmp_path / "configs"
         configs.mkdir()

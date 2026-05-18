@@ -24,8 +24,8 @@ import structlog
 async def _tick() -> int:
     log = structlog.get_logger("sheet_posting_tick")
     try:
-        from glitch_signal.sheet_posting.poster import post_one
-        from glitch_signal.sheet_posting.reader import fetch_next_due
+        from social_signal.sheet_posting.poster import post_one
+        from social_signal.sheet_posting.reader import fetch_next_due
     except Exception as exc:
         log.error("tick.import_failed", error=str(exc)[:300])
         return 1

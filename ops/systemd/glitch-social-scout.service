@@ -1,5 +1,5 @@
 [Unit]
-Description=Glitch Social Media Agent — periodic scout trigger for ai_generated text brands
+Description=AI Social Agent — periodic scout trigger for ai_generated text brands
 After=ai-social-media-agent.service
 Requires=ai-social-media-agent.service
 

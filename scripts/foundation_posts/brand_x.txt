@@ -4,6 +4,6 @@ Trading ensembles. Sports intelligence. Voice AI. Ad attribution.
 
 One pattern: coordinated ensembles > single models.
 
-github.com/glitch-exec-labs
+github.com/<your-org>
 
-#buildinpublic #glitchexecutor
+#buildinpublic #example

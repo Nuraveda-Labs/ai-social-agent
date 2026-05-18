@@ -25,7 +25,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -48,22 +48,22 @@ class _FakeSP:
 
 class TestInAnySlot:
     def test_exact_slot_match(self):
-        from glitch_signal.scheduler.queue import _in_any_slot
+        from social_signal.scheduler.queue import _in_any_slot
         now = datetime(2026, 4, 17, 17, 30)
         assert _in_any_slot(now, ["17:30", "22:00"], tolerance_minutes=15)
 
     def test_within_tolerance(self):
-        from glitch_signal.scheduler.queue import _in_any_slot
+        from social_signal.scheduler.queue import _in_any_slot
         now = datetime(2026, 4, 17, 17, 40)
         assert _in_any_slot(now, ["17:30", "22:00"], tolerance_minutes=15)
 
     def test_outside_every_slot(self):
-        from glitch_signal.scheduler.queue import _in_any_slot
+        from social_signal.scheduler.queue import _in_any_slot
         now = datetime(2026, 4, 17, 14, 0)
         assert not _in_any_slot(now, ["17:30", "22:00"], tolerance_minutes=15)
 
     def test_bad_slot_string_ignored(self):
-        from glitch_signal.scheduler.queue import _in_any_slot
+        from social_signal.scheduler.queue import _in_any_slot
         now = datetime(2026, 4, 17, 22, 0)
         # "garbage" is ignored; "22:00" still matches.
         assert _in_any_slot(now, ["garbage", "22:00"], tolerance_minutes=5)
@@ -75,7 +75,7 @@ class TestInAnySlot:
 
 class TestFirstEligible:
     def test_picks_oldest_when_no_recent_history(self):
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         a = _FakeSP("a", variant_group="liver_ad15_uk", product="liver")
         b = _FakeSP("b", variant_group="lungs_uk", product="lungs")
         pick = _first_eligible(
@@ -86,7 +86,7 @@ class TestFirstEligible:
         assert pick is a
 
     def test_skips_candidate_in_recent_variant_window(self):
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         # Most recent post was liver_ad15_uk → variant_gap=5 means the
         # next 5 picks cannot repeat that group.
         dupe = _FakeSP("dupe", variant_group="liver_ad15_uk", product="liver")
@@ -100,7 +100,7 @@ class TestFirstEligible:
 
     def test_skips_candidate_with_recent_product(self):
         """product_gap=2 blocks repeat products in the last 2 posts."""
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         liver2 = _FakeSP("x", variant_group="liver_ad40_uk", product="liver")
         lungs  = _FakeSP("y", variant_group="lungs_uk",      product="lungs")
         pick = _first_eligible(
@@ -111,7 +111,7 @@ class TestFirstEligible:
         assert pick is lungs
 
     def test_variant_gap_zero_disables_anti_repeat(self):
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         dupe = _FakeSP("d", variant_group="liver_ad15_uk", product="liver")
         pick = _first_eligible(
             [dupe],
@@ -121,7 +121,7 @@ class TestFirstEligible:
         assert pick is dupe
 
     def test_skip_pattern_excludes(self):
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         draft = _FakeSP("x", variant_group="liver_draft_uk", product="liver")
         prod  = _FakeSP("y", variant_group="liver_ad20_uk",  product="liver")
         pick = _first_eligible(
@@ -132,7 +132,7 @@ class TestFirstEligible:
         assert pick is prod
 
     def test_returns_none_when_nothing_eligible(self):
-        from glitch_signal.scheduler.queue import _first_eligible
+        from social_signal.scheduler.queue import _first_eligible
         only = _FakeSP("only", variant_group="liver_ad15_uk", product="liver")
         assert _first_eligible(
             [only],
@@ -149,8 +149,8 @@ class TestPostingRulesFor:
     def test_returns_none_when_task_disabled(self, tmp_path, monkeypatch):
         import json
 
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler.queue import _posting_rules_for
+        from social_signal import config as cfg
+        from social_signal.scheduler.queue import _posting_rules_for
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -169,8 +169,8 @@ class TestPostingRulesFor:
     def test_returns_rules_when_enabled(self, tmp_path, monkeypatch):
         import json
 
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler.queue import _posting_rules_for
+        from social_signal import config as cfg
+        from social_signal.scheduler.queue import _posting_rules_for
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -190,8 +190,8 @@ class TestPostingRulesFor:
     def test_returns_none_when_no_tasks_block(self, tmp_path, monkeypatch):
         import json
 
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler.queue import _posting_rules_for
+        from social_signal import config as cfg
+        from social_signal.scheduler.queue import _posting_rules_for
 
         configs = tmp_path / "configs"
         configs.mkdir()

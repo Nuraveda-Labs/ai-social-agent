@@ -18,7 +18,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -39,10 +39,10 @@ async def _build_test_db():
         await conn.run_sync(SQLModel.metadata.create_all)
     factory = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-    import glitch_signal.agent.nodes.publisher as pub
-    import glitch_signal.db.session as db_session
-    import glitch_signal.scheduler.queue as q
-    import glitch_signal.webhooks.upload_post as wh
+    import social_signal.agent.nodes.publisher as pub
+    import social_signal.db.session as db_session
+    import social_signal.scheduler.queue as q
+    import social_signal.webhooks.upload_post as wh
 
     def _factory_getter():
         return factory
@@ -69,12 +69,12 @@ class TestUploadCompleted:
     async def test_finalizes_scheduled_post_and_writes_published_post(self):
         from sqlmodel import select
 
-        from glitch_signal.db.models import (
+        from social_signal.db.models import (
             PublishedPost,
             ScheduledPost,
             VideoAsset,
         )
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -139,12 +139,12 @@ class TestUploadCompleted:
     async def test_duplicate_webhook_is_idempotent(self):
         from sqlmodel import select
 
-        from glitch_signal.db.models import (
+        from social_signal.db.models import (
             PublishedPost,
             ScheduledPost,
             VideoAsset,
         )
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -200,8 +200,8 @@ class TestUploadCompleted:
 
     @pytest.mark.asyncio
     async def test_failed_publish_marks_scheduled_post_failed(self):
-        from glitch_signal.db.models import ScheduledPost, VideoAsset
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.db.models import ScheduledPost, VideoAsset
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -252,7 +252,7 @@ class TestUploadCompleted:
 
     @pytest.mark.asyncio
     async def test_unknown_request_id_logs_but_returns_ok(self):
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -277,8 +277,8 @@ class TestUploadCompleted:
 class TestAccountEvents:
     @pytest.mark.asyncio
     async def test_reauth_required_flips_platform_auth_status(self):
-        from glitch_signal.db.models import PlatformAuth
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.db.models import PlatformAuth
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -316,8 +316,8 @@ class TestAccountEvents:
 
     @pytest.mark.asyncio
     async def test_disconnected_marks_revoked(self):
-        from glitch_signal.db.models import PlatformAuth
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.db.models import PlatformAuth
+        from social_signal.webhooks.upload_post import dispatch
 
         factory, originals = await _build_test_db()
         try:
@@ -359,7 +359,7 @@ class TestAccountEvents:
 class TestUnknownEvents:
     @pytest.mark.asyncio
     async def test_unknown_event_type_returns_ok_handled_false(self):
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.webhooks.upload_post import dispatch
 
         r = await dispatch({"event": "something_new", "data": {}})
         assert r["ok"] is True
@@ -367,7 +367,7 @@ class TestUnknownEvents:
 
     @pytest.mark.asyncio
     async def test_missing_event_type_returns_ok_false(self):
-        from glitch_signal.webhooks.upload_post import dispatch
+        from social_signal.webhooks.upload_post import dispatch
 
         r = await dispatch({"no_event_key": True})
         assert r["ok"] is False
@@ -383,8 +383,8 @@ class TestWebhookHTTPEndpoint:
     async def test_bad_secret_returns_403(self, monkeypatch):
         from fastapi import HTTPException
 
-        from glitch_signal import config as cfg
-        from glitch_signal.server import upload_post_webhook
+        from social_signal import config as cfg
+        from social_signal.server import upload_post_webhook
 
         monkeypatch.setenv("UPLOAD_POST_WEBHOOK_SECRET", "correct-secret")
         cfg.settings.cache_clear()
@@ -401,8 +401,8 @@ class TestWebhookHTTPEndpoint:
     async def test_missing_config_returns_503(self, monkeypatch):
         from fastapi import HTTPException
 
-        from glitch_signal import config as cfg
-        from glitch_signal.server import upload_post_webhook
+        from social_signal import config as cfg
+        from social_signal.server import upload_post_webhook
 
         monkeypatch.setenv("UPLOAD_POST_WEBHOOK_SECRET", "")
         cfg.settings.cache_clear()
@@ -417,8 +417,8 @@ class TestWebhookHTTPEndpoint:
 
     @pytest.mark.asyncio
     async def test_good_secret_dispatches(self, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.server import upload_post_webhook
+        from social_signal import config as cfg
+        from social_signal.server import upload_post_webhook
 
         monkeypatch.setenv("UPLOAD_POST_WEBHOOK_SECRET", "good-secret")
         cfg.settings.cache_clear()
@@ -430,7 +430,7 @@ class TestWebhookHTTPEndpoint:
             return {"ok": True, "handled": False, "event": event.get("event")}
 
         monkeypatch.setattr(
-            "glitch_signal.webhooks.upload_post.dispatch", fake_dispatch
+            "social_signal.webhooks.upload_post.dispatch", fake_dispatch
         )
 
         class _FakeReq:
@@ -456,13 +456,13 @@ class TestReconciliationSweep:
 
         from sqlmodel import select
 
-        from glitch_signal import config as cfg
-        from glitch_signal.db.models import (
+        from social_signal import config as cfg
+        from social_signal.db.models import (
             PublishedPost,
             ScheduledPost,
             VideoAsset,
         )
-        from glitch_signal.scheduler import queue as q
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         monkeypatch.setenv("UPLOAD_POST_WEBHOOK_RECONCILE_AFTER_S", "60")
@@ -503,7 +503,7 @@ class TestReconciliationSweep:
                 return "7629000", "https://tt/x/video/7629000"
 
             monkeypatch.setattr(
-                "glitch_signal.platforms.upload_post.poll_status_for_request",
+                "social_signal.platforms.upload_post.poll_status_for_request",
                 fake_poll,
             )
 
@@ -529,14 +529,14 @@ class TestReconciliationSweep:
         to `posted`. 11 Namhya posts went live but sheet stayed stale."""
         from datetime import timedelta
 
-        from glitch_signal import config as cfg
-        from glitch_signal.db.models import (
+        from social_signal import config as cfg
+        from social_signal.db.models import (
             ContentScript,
             ScheduledPost,
             Signal,
             VideoAsset,
         )
-        from glitch_signal.scheduler import queue as q
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         monkeypatch.setenv("UPLOAD_POST_WEBHOOK_RECONCILE_AFTER_S", "60")
@@ -577,7 +577,7 @@ class TestReconciliationSweep:
             async def fake_poll(req_id, target):
                 return "TT-POST-1", "https://tiktok.com/x/video/1"
             monkeypatch.setattr(
-                "glitch_signal.platforms.upload_post.poll_status_for_request",
+                "social_signal.platforms.upload_post.poll_status_for_request",
                 fake_poll,
             )
 
@@ -588,7 +588,7 @@ class TestReconciliationSweep:
                 captured_sheet["updates"] = updates
                 return True
             monkeypatch.setattr(
-                "glitch_signal.integrations.sheet_tracker.update_by_video_name",
+                "social_signal.integrations.sheet_tracker.update_by_video_name",
                 fake_update,
             )
 
@@ -605,9 +605,9 @@ class TestReconciliationSweep:
     async def test_sweep_skips_rows_inside_reconcile_window(self, monkeypatch):
         from datetime import timedelta
 
-        from glitch_signal import config as cfg
-        from glitch_signal.db.models import ScheduledPost, VideoAsset
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.db.models import ScheduledPost, VideoAsset
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("UPLOAD_POST_API_KEY", "k")
         # Window = 600s. last_attempt_at = 60s ago → inside window → skip.
@@ -647,7 +647,7 @@ class TestReconciliationSweep:
                 )
 
             monkeypatch.setattr(
-                "glitch_signal.platforms.upload_post.poll_status_for_request",
+                "social_signal.platforms.upload_post.poll_status_for_request",
                 fake_poll,
             )
 
@@ -663,8 +663,8 @@ class TestReconciliationSweep:
 class TestPublisherWebhookPendingSentinel:
     @pytest.mark.asyncio
     async def test_sentinel_persists_request_id_and_sets_awaiting_webhook(self):
-        from glitch_signal.agent.nodes import publisher as pub
-        from glitch_signal.db.models import ScheduledPost, VideoAsset
+        from social_signal.agent.nodes import publisher as pub
+        from social_signal.db.models import ScheduledPost, VideoAsset
 
         factory, originals = await _build_test_db()
         try:
@@ -697,7 +697,7 @@ class TestPublisherWebhookPendingSentinel:
             # Stub pre-publish hooks so this test doesn't need a real file
             # on disk — we're exercising publisher.py's sentinel handling,
             # not the transform or JIT-download pipelines.
-            import glitch_signal.media.ffmpeg as ffmpeg_mod
+            import social_signal.media.ffmpeg as ffmpeg_mod
             async def passthrough(file_path, brand_id, platform_key):
                 return file_path
             async def noop_ensure(asset):

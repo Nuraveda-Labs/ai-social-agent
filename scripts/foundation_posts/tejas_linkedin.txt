@@ -24,6 +24,6 @@ The part I find most interesting: the coordination layer is always the hard part
 
 Starting to post here about decisions, lessons, and what building this at this pace actually looks like. Not the highlight reel.
 
-Everything is public: github.com/glitch-exec-labs
+Everything is public: github.com/<your-org>
 
-#buildinpublic #glitchexecutor #ai #founder #algotrading
+#buildinpublic #example #ai #founder #algotrading

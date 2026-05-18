@@ -20,7 +20,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -51,8 +51,8 @@ async def _build_test_db():
         await conn.run_sync(SQLModel.metadata.create_all)
     factory = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-    import glitch_signal.analytics.upload_post as an
-    import glitch_signal.db.session as db_session
+    import social_signal.analytics.upload_post as an
+    import social_signal.db.session as db_session
 
     def _getter():
         return factory
@@ -76,19 +76,19 @@ def _restore(originals: dict) -> None:
 
 class TestExtractMetrics:
     def test_flat_shape(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics({"views": 1200, "likes": 45, "comments": 3, "shares": 7}, "tiktok")
         assert m == {"views": 1200, "likes": 45, "comments": 3, "shares": 7}
 
     def test_nested_metrics_key(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics({"metrics": {"view_count": 500, "like_count": 10}}, "tiktok")
         assert m["views"] == 500
         assert m["likes"] == 10
         assert m["comments"] == 0
 
     def test_platform_keyed_shape(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics(
             {"tiktok": {"play_count": 9000, "favorite_count": 100}},
             "tiktok",
@@ -97,19 +97,19 @@ class TestExtractMetrics:
         assert m["likes"] == 100
 
     def test_youtube_aliases(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics({"video_views": 5, "favorites": 2, "replies": 1}, "youtube")
         assert m["views"] == 5
         assert m["likes"] == 2
         assert m["comments"] == 1
 
     def test_unknown_keys_yield_zero(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics({"nothing_known": 42}, "tiktok")
         assert m == {"views": 0, "likes": 0, "comments": 0, "shares": 0}
 
     def test_non_numeric_values_ignored(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics({"views": "not a number", "likes": True, "shares": 5}, "tiktok")
         # "not a number" rejected, True rejected (bool is int subclass but we
         # explicitly guard), 5 accepted.
@@ -118,7 +118,7 @@ class TestExtractMetrics:
         assert m["shares"] == 5
 
     def test_non_dict_payload_safe(self):
-        from glitch_signal.analytics.upload_post import extract_metrics
+        from social_signal.analytics.upload_post import extract_metrics
         m = extract_metrics(None, "tiktok")
         assert m == {"views": 0, "likes": 0, "comments": 0, "shares": 0}
 
@@ -129,12 +129,12 @@ class TestExtractMetrics:
 
 class TestCanonicalPlatform:
     def test_upload_post_prefix_stripped(self):
-        from glitch_signal.analytics.upload_post import _canonical_platform
+        from social_signal.analytics.upload_post import _canonical_platform
         assert _canonical_platform("upload_post_tiktok") == "tiktok"
         assert _canonical_platform("upload_post_youtube") == "youtube"
 
     def test_non_upload_post_returns_none(self):
-        from glitch_signal.analytics.upload_post import _canonical_platform
+        from social_signal.analytics.upload_post import _canonical_platform
         assert _canonical_platform("zernio_tiktok") is None
         assert _canonical_platform("tiktok") is None
 
@@ -146,9 +146,9 @@ class TestCanonicalPlatform:
 class TestSweepEligibility:
     @pytest.mark.asyncio
     async def test_pulls_once_for_post_with_no_snapshot(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import MetricsSnapshot, PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import MetricsSnapshot, PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -184,7 +184,7 @@ class TestSweepEligibility:
                 return {"views": 1200, "likes": 45, "comments": 3, "shares": 7}
 
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 fake_fetch,
             )
 
@@ -209,9 +209,9 @@ class TestSweepEligibility:
 
     @pytest.mark.asyncio
     async def test_skips_posts_inside_first_pull_grace(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -240,7 +240,7 @@ class TestSweepEligibility:
             async def must_not_fetch(*a, **kw):
                 raise AssertionError("fetch should not run inside first-pull grace")
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 must_not_fetch,
             )
 
@@ -251,9 +251,9 @@ class TestSweepEligibility:
 
     @pytest.mark.asyncio
     async def test_skips_posts_with_recent_snapshot(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import MetricsSnapshot, PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import MetricsSnapshot, PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -290,7 +290,7 @@ class TestSweepEligibility:
             async def must_not_fetch(*a, **kw):
                 raise AssertionError("fetch should not run; snapshot is fresh")
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 must_not_fetch,
             )
 
@@ -301,9 +301,9 @@ class TestSweepEligibility:
 
     @pytest.mark.asyncio
     async def test_re_pulls_when_snapshot_is_stale(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import MetricsSnapshot, PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import MetricsSnapshot, PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -340,7 +340,7 @@ class TestSweepEligibility:
             async def fake_fetch(platform_post_id, platform, user):
                 return {"views": 200, "likes": 12, "comments": 1, "shares": 2}
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 fake_fetch,
             )
 
@@ -361,9 +361,9 @@ class TestSweepEligibility:
 
     @pytest.mark.asyncio
     async def test_skips_non_upload_post_platforms(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -392,7 +392,7 @@ class TestSweepEligibility:
             async def must_not_fetch(*a, **kw):
                 raise AssertionError("zernio-backed posts are out of scope")
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 must_not_fetch,
             )
 
@@ -403,9 +403,9 @@ class TestSweepEligibility:
 
     @pytest.mark.asyncio
     async def test_fetch_error_does_not_write_snapshot(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.analytics.upload_post import sweep_due_posts
-        from glitch_signal.db.models import MetricsSnapshot, PublishedPost
+        from social_signal import config as cfg
+        from social_signal.analytics.upload_post import sweep_due_posts
+        from social_signal.db.models import MetricsSnapshot, PublishedPost
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -434,7 +434,7 @@ class TestSweepEligibility:
             async def raising_fetch(*a, **kw):
                 raise RuntimeError("upstream 503")
             monkeypatch.setattr(
-                "glitch_signal.analytics.upload_post.fetch_metrics_for_post",
+                "social_signal.analytics.upload_post.fetch_metrics_for_post",
                 raising_fetch,
             )
 

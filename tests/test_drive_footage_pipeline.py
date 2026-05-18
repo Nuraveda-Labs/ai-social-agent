@@ -18,7 +18,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -32,20 +32,20 @@ def _reset_caches():
 
 class TestGraphEntryRouting:
     def test_drive_footage_routes_to_drive_scout(self):
-        from glitch_signal.agent.graph import _entry_router
+        from social_signal.agent.graph import _entry_router
         assert _entry_router({"content_source": "drive_footage"}) == "drive_scout"
 
     def test_ai_generated_routes_to_scout(self):
-        from glitch_signal.agent.graph import _entry_router
+        from social_signal.agent.graph import _entry_router
         assert _entry_router({"content_source": "ai_generated"}) == "scout"
 
     def test_missing_content_source_defaults_to_scout(self):
-        from glitch_signal.agent.graph import _entry_router
+        from social_signal.agent.graph import _entry_router
         assert _entry_router({}) == "scout"
         assert _entry_router({"content_source": ""}) == "scout"
 
     def test_case_insensitive(self):
-        from glitch_signal.agent.graph import _entry_router
+        from social_signal.agent.graph import _entry_router
         assert _entry_router({"content_source": "DRIVE_FOOTAGE"}) == "drive_scout"
 
 
@@ -55,20 +55,20 @@ class TestGraphEntryRouting:
 
 class TestDriveFileFiltering:
     def test_is_video_by_mime(self):
-        from glitch_signal.integrations.google_drive import _is_video
+        from social_signal.integrations.google_drive import _is_video
         assert _is_video("clip.mp4", "video/mp4")
         assert _is_video("clip.webm", "video/webm")
         assert not _is_video("doc.pdf", "application/pdf")
 
     def test_is_video_by_extension_when_mime_missing(self):
-        from glitch_signal.integrations.google_drive import _is_video
+        from social_signal.integrations.google_drive import _is_video
         # Some Drive exports don't set mimeType reliably; extension fallback matters.
         assert _is_video("clip.mp4", "")
         assert _is_video("clip.MOV", "application/octet-stream")
         assert not _is_video("spreadsheet.xlsx", "application/octet-stream")
 
     def test_normalise_filters_non_video(self):
-        from glitch_signal.integrations.google_drive import _normalise
+        from social_signal.integrations.google_drive import _normalise
         rec = _normalise(
             {"id": "f1", "name": "notes.pdf", "mimeType": "application/pdf"},
             svc=None,
@@ -83,7 +83,7 @@ class TestDriveFileFiltering:
 class TestDriveScoutNode:
     @pytest.mark.asyncio
     async def test_happy_path_creates_signals_without_downloading(self, tmp_path, monkeypatch):
-        from glitch_signal.integrations.google_drive import DriveFile
+        from social_signal.integrations.google_drive import DriveFile
 
         # Brand config fixture: drive_footage + known folder id
         configs = tmp_path / "configs"
@@ -98,12 +98,12 @@ class TestDriveScoutNode:
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
         monkeypatch.setenv("VIDEO_STORAGE_PATH", str(tmp_path / "videos"))
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
         # Mock Drive client methods so no network touches happen.
-        import glitch_signal.integrations.google_drive as gdrive
+        import social_signal.integrations.google_drive as gdrive
 
         fake_files = [
             DriveFile(id="F1", name="clip_a.mp4", mime_type="video/mp4", size=1000, md5=None, modified_time=None),
@@ -126,7 +126,7 @@ class TestDriveScoutNode:
         # In-memory SQLite for DB writes.
         await _make_memory_db()
 
-        from glitch_signal.agent.nodes.drive_scout import drive_scout_node
+        from social_signal.agent.nodes.drive_scout import drive_scout_node
         state = await drive_scout_node({"brand_id": "drive_brand"})
 
         assert state.get("error") is None, state.get("error")
@@ -156,11 +156,11 @@ class TestDriveScoutNode:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
-        from glitch_signal.agent.nodes.drive_scout import drive_scout_node
+        from social_signal.agent.nodes.drive_scout import drive_scout_node
         state = await drive_scout_node({"brand_id": "glitch_executor"})
         assert "expected 'drive_footage'" in (state.get("error") or "")
 
@@ -185,7 +185,7 @@ class TestCaptionWriterNode:
         monkeypatch.setenv("DEFAULT_BRAND_ID", "drive_brand")
         monkeypatch.setenv("VIDEO_STORAGE_PATH", str(tmp_path / "videos"))
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
 
@@ -195,7 +195,7 @@ class TestCaptionWriterNode:
         import uuid
         from datetime import datetime
 
-        from glitch_signal.db.models import Signal
+        from social_signal.db.models import Signal
 
         sig_id = str(uuid.uuid4())
         async with factory() as session:
@@ -220,8 +220,8 @@ class TestCaptionWriterNode:
         from unittest.mock import AsyncMock, patch
         mock_resp = type("R", (), {"choices": [type("C", (), {"message": type("M", (), {"content": '{"title": "Golden hour root", "caption": "A moment with the root.\\n\\n#tag1 #brand", "hashtags": ["tag1", "brand"]}'})()})()]})()
 
-        from glitch_signal.agent.nodes.caption_writer import caption_writer_node
-        with patch("glitch_signal.agent.nodes.caption_writer.litellm.acompletion", new=AsyncMock(return_value=mock_resp)):
+        from social_signal.agent.nodes.caption_writer import caption_writer_node
+        with patch("social_signal.agent.nodes.caption_writer.litellm.acompletion", new=AsyncMock(return_value=mock_resp)):
             state = await caption_writer_node({
                 "brand_id": "drive_brand",
                 "signal_id": sig_id,
@@ -239,7 +239,7 @@ class TestCaptionWriterNode:
         # Confirm both rows landed with the right brand_id
         from sqlmodel import select
 
-        from glitch_signal.db.models import ContentScript, VideoAsset
+        from social_signal.db.models import ContentScript, VideoAsset
         async with factory() as session:
             cs_rows = (await session.execute(select(ContentScript))).scalars().all()
             va_rows = (await session.execute(select(VideoAsset))).scalars().all()
@@ -254,17 +254,17 @@ class TestCaptionWriterNode:
 
 class TestCaptionJsonParser:
     def test_plain_json(self):
-        from glitch_signal.agent.nodes.caption_writer import _parse_caption_json
+        from social_signal.agent.nodes.caption_writer import _parse_caption_json
         got = _parse_caption_json('{"title": "a", "caption": "b", "hashtags": ["x"]}')
         assert got == {"title": "a", "caption": "b", "hashtags": ["x"]}
 
     def test_markdown_fenced(self):
-        from glitch_signal.agent.nodes.caption_writer import _parse_caption_json
+        from social_signal.agent.nodes.caption_writer import _parse_caption_json
         got = _parse_caption_json('```json\n{"title": "a", "caption": "b"}\n```')
         assert got == {"title": "a", "caption": "b"}
 
     def test_truncated_recovers_prefix(self):
-        from glitch_signal.agent.nodes.caption_writer import _parse_caption_json
+        from social_signal.agent.nodes.caption_writer import _parse_caption_json
         # Model ran out of tokens mid-generation: everything before the
         # last complete brace should still be usable.
         truncated = '{"title": "a", "caption": "b"} and then trailing gar'
@@ -272,12 +272,12 @@ class TestCaptionJsonParser:
         assert got.get("caption") == "b"
 
     def test_empty_returns_empty(self):
-        from glitch_signal.agent.nodes.caption_writer import _parse_caption_json
+        from social_signal.agent.nodes.caption_writer import _parse_caption_json
         assert _parse_caption_json("") == {}
         assert _parse_caption_json("   ") == {}
 
     def test_garbage_returns_empty(self):
-        from glitch_signal.agent.nodes.caption_writer import _parse_caption_json
+        from social_signal.agent.nodes.caption_writer import _parse_caption_json
         assert _parse_caption_json("not json at all, no braces") == {}
 
 
@@ -320,10 +320,10 @@ async def _make_memory_db(monkeypatch=None):
     from sqlmodel import SQLModel
     from sqlmodel.ext.asyncio.session import AsyncSession
 
-    import glitch_signal.agent.nodes.caption_writer as cw_mod
-    import glitch_signal.agent.nodes.drive_scout as ds_mod
-    import glitch_signal.db.models  # noqa: F401 — register metadata
-    import glitch_signal.db.session as dbs
+    import social_signal.agent.nodes.caption_writer as cw_mod
+    import social_signal.agent.nodes.drive_scout as ds_mod
+    import social_signal.db.models  # noqa: F401 — register metadata
+    import social_signal.db.session as dbs
 
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
     async with engine.begin() as conn:

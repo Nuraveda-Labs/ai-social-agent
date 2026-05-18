@@ -1,12 +1,12 @@
-# Contributing to Glitch Social Media Agent
+# Contributing to AI Social Agent
 
 Thanks for your interest. This is a build-in-public project — contributions that improve the open-source engine are welcome.
 
 ## What's in scope
 
 - Bug fixes in the video pipeline, scheduler, ORM, or platform integrations
-- New video model clients (`src/glitch_signal/video_models/`)
-- New platform publishers (`src/glitch_signal/platforms/`)
+- New video model clients (`src/social_signal/video_models/`)
+- New platform publishers (`src/social_signal/platforms/`)
 - Performance improvements to the scheduler or assembler
 - Test coverage improvements
 
@@ -18,7 +18,7 @@ Thanks for your interest. This is a build-in-public project — contributions th
 ## Setup
 
 ```bash
-git clone https://gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-social-media-agent
+git clone https://gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-social-media-agent
 cd ai_marketing_stack-ai-social-media-agent
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -38,7 +38,7 @@ ruff check src/ tests/
 
 ## Adding a video model
 
-1. Create `src/glitch_signal/video_models/{model_name}.py`
+1. Create `src/social_signal/video_models/{model_name}.py`
 2. Implement the `VideoModel` ABC from `video_models/base.py`:
    - `generate(req: VideoGenerationRequest) -> VideoGenerationResult`
    - `poll(api_job_id: str) -> VideoGenerationResult`
@@ -49,7 +49,7 @@ ruff check src/ tests/
 
 ## Adding a platform
 
-1. Create `src/glitch_signal/platforms/{platform}.py`
+1. Create `src/social_signal/platforms/{platform}.py`
 2. Implement `upload(asset_path, metadata) -> str` (returns platform post ID)
 3. Wire into `agent/nodes/publisher.py`
 4. Document required env vars in `.env.example`

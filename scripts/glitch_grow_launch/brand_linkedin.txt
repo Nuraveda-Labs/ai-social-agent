@@ -14,6 +14,6 @@ What we shipped on AI Marketing Stack this week:
 
 Full breakdown in the carousel.
 
-gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent
+gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-ads-agent
 
 #buildinpublic #ecommerce #adsops #metaads

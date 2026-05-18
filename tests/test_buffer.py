@@ -18,7 +18,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -51,7 +51,7 @@ def _write_brand(
 
 class TestBufferPlatformMap:
     def test_known_platform_keys(self):
-        from glitch_signal.platforms.buffer import _PLATFORM_MAP
+        from social_signal.platforms.buffer import _PLATFORM_MAP
         assert _PLATFORM_MAP["buffer_tiktok"] == "tiktok"
         assert _PLATFORM_MAP["buffer_instagram"] == "instagram"
         assert _PLATFORM_MAP["buffer_youtube"] == "youtube"
@@ -59,13 +59,13 @@ class TestBufferPlatformMap:
 
 class TestBufferSentinel:
     def test_webhook_pending_roundtrip(self):
-        from glitch_signal.platforms import buffer
+        from social_signal.platforms import buffer
         token = f"webhook_pending:{'x' * 24}"
         assert buffer.is_webhook_pending(token)
         assert buffer.extract_post_id(token) == "x" * 24
 
     def test_non_pending_tokens_rejected(self):
-        from glitch_signal.platforms import buffer
+        from social_signal.platforms import buffer
         assert not buffer.is_webhook_pending("")
         assert not buffer.is_webhook_pending("plain-id")
         with pytest.raises(ValueError):
@@ -75,7 +75,7 @@ class TestBufferSentinel:
 class TestBufferDryRun:
     @pytest.mark.asyncio
     async def test_dry_run_returns_fake_id_no_http(self):
-        from glitch_signal.platforms import buffer
+        from social_signal.platforms import buffer
         publish_id, url = await buffer.publish(
             platform="buffer_tiktok",
             file_path="/does/not/matter.mp4",
@@ -91,8 +91,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_rejects_missing_brand_id(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
@@ -104,8 +104,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_rejects_missing_token(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("BUFFER_API_TOKEN", "")
         config.settings.cache_clear()
@@ -117,8 +117,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_rejects_unknown_platform_key(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
@@ -132,8 +132,8 @@ class TestBufferLiveValidation:
     async def test_non_tiktok_targets_not_implemented(self, monkeypatch, tmp_path):
         """Module is TikTok-only today — non-tiktok targets must raise early,
         before any HTTP traffic."""
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -162,8 +162,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_requires_channel_id(self, monkeypatch, tmp_path):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -185,8 +185,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_requires_organization_id(self, monkeypatch, tmp_path):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -208,8 +208,8 @@ class TestBufferLiveValidation:
 
     @pytest.mark.asyncio
     async def test_missing_video_file_raises(self, monkeypatch, tmp_path):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
 
         configs = tmp_path / "configs"
         configs.mkdir()
@@ -235,8 +235,8 @@ class TestBufferPollStatus:
 
     @pytest.mark.asyncio
     async def test_sent_returns_external_link(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
 
@@ -266,8 +266,8 @@ class TestBufferPollStatus:
     @pytest.mark.asyncio
     async def test_sending_returns_none_none(self, monkeypatch):
         """`sending`/processing → in-flight, reconcile should retry next tick."""
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
 
@@ -294,8 +294,8 @@ class TestBufferPollStatus:
 
     @pytest.mark.asyncio
     async def test_failed_raises(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
 
@@ -324,8 +324,8 @@ class TestBufferPollStatus:
     async def test_graphql_errors_raise(self, monkeypatch):
         """Rate limit / auth errors from Buffer bubble up so the reconcile
         loop leaves the row for the next tick."""
-        from glitch_signal import config
-        from glitch_signal.platforms import buffer
+        from social_signal import config
+        from social_signal.platforms import buffer
         monkeypatch.setenv("BUFFER_API_TOKEN", "t")
         config.settings.cache_clear()
 
@@ -355,7 +355,7 @@ class TestPublishPriority:
     """Priority list must prefer buffer_tiktok over upload_post_tiktok."""
 
     def test_tiktok_priority_order(self):
-        from glitch_signal.config import _PUBLISH_PRIORITY
+        from social_signal.config import _PUBLISH_PRIORITY
         tiktok_list = _PUBLISH_PRIORITY["tiktok"]
         assert tiktok_list[0] == "buffer_tiktok", (
             f"buffer_tiktok must be first for tiktok; got {tiktok_list}"

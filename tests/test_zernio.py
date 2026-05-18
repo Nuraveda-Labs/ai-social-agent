@@ -16,7 +16,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -26,7 +26,7 @@ def _reset_caches():
 
 class TestZernioPlatformMap:
     def test_known_platform_keys(self):
-        from glitch_signal.platforms.zernio import _PLATFORM_MAP
+        from social_signal.platforms.zernio import _PLATFORM_MAP
         assert _PLATFORM_MAP["zernio_tiktok"] == "tiktok"
         assert _PLATFORM_MAP["zernio_instagram"] == "instagram"
         assert _PLATFORM_MAP["zernio_youtube"] == "youtube"
@@ -35,7 +35,7 @@ class TestZernioPlatformMap:
 class TestZernioDryRun:
     @pytest.mark.asyncio
     async def test_dry_run_returns_fake_id_no_http(self):
-        from glitch_signal.platforms import zernio
+        from social_signal.platforms import zernio
         publish_id, url = await zernio.publish(
             platform="zernio_tiktok",
             file_path="/does/not/matter.mp4",
@@ -47,8 +47,8 @@ class TestZernioDryRun:
 
     @pytest.mark.asyncio
     async def test_live_rejects_missing_api_key(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import zernio
+        from social_signal import config
+        from social_signal.platforms import zernio
 
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("ZERNIO_API_KEY", "")
@@ -64,8 +64,8 @@ class TestZernioDryRun:
 
     @pytest.mark.asyncio
     async def test_live_rejects_unknown_platform_key(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import zernio
+        from social_signal import config
+        from social_signal.platforms import zernio
 
         monkeypatch.setenv("DISPATCH_MODE", "live")
         monkeypatch.setenv("ZERNIO_API_KEY", "k")
@@ -85,7 +85,7 @@ class TestPublisherRoutesZernio:
 
     @pytest.mark.asyncio
     async def test_routes_zernio_tiktok(self, monkeypatch):
-        from glitch_signal.agent.nodes import publisher
+        from social_signal.agent.nodes import publisher
 
         captured = {}
 
@@ -94,9 +94,9 @@ class TestPublisherRoutesZernio:
             captured["brand_id"] = brand_id
             return "zernio-stub-id", "https://tiktok.com/@x/video/1"
 
-        monkeypatch.setattr("glitch_signal.platforms.zernio.publish", fake_zernio_publish)
+        monkeypatch.setattr("social_signal.platforms.zernio.publish", fake_zernio_publish)
         monkeypatch.setenv("DISPATCH_MODE", "live")
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
         cfg.settings.cache_clear()
 
         post_id, url = await publisher._publish_to_platform(
@@ -113,7 +113,7 @@ class TestZernio409Recovery:
     account, and return the already-live post instead of re-raising."""
 
     def test_409_triggers_list_and_returns_existing_post(self, monkeypatch):
-        from glitch_signal.platforms import zernio as zpub
+        from social_signal.platforms import zernio as zpub
 
         class _ZernioAPIError(Exception):
             def __init__(self, message, status_code=None, details=None):
@@ -177,7 +177,7 @@ class TestZernio409Recovery:
         assert url == "https://www.tiktok.com/@x/video/7629616067718958337"
 
     def test_409_with_no_matching_post_reraises(self, monkeypatch):
-        from glitch_signal.platforms import zernio as zpub
+        from social_signal.platforms import zernio as zpub
 
         class _ZernioAPIError(Exception):
             def __init__(self, message, status_code=None, details=None):
@@ -213,7 +213,7 @@ class TestZernio409Recovery:
             )
 
     def test_non_409_error_is_propagated_unchanged(self, monkeypatch):
-        from glitch_signal.platforms import zernio as zpub
+        from social_signal.platforms import zernio as zpub
 
         class _ZernioAPIError(Exception):
             def __init__(self, message, status_code=None, details=None):
@@ -250,8 +250,8 @@ class TestSignedMediaUrl:
     """_build_signed_media_url produces a token verifiable by /media/fetch."""
 
     def test_token_round_trips(self, tmp_path):
-        from glitch_signal.crypto import verify_state_token
-        from glitch_signal.platforms.zernio import _build_signed_media_url
+        from social_signal.crypto import verify_state_token
+        from social_signal.platforms.zernio import _build_signed_media_url
 
         p = tmp_path / "clip.mp4"
         p.write_bytes(b"x")
@@ -263,7 +263,7 @@ class TestSignedMediaUrl:
         assert payload["p"] == str(p.resolve())
 
     def test_token_different_per_file(self, tmp_path):
-        from glitch_signal.platforms.zernio import _build_signed_media_url
+        from social_signal.platforms.zernio import _build_signed_media_url
         a = tmp_path / "a.mp4"
         a.write_bytes(b"a")
         b = tmp_path / "b.mp4"

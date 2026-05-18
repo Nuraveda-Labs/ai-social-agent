@@ -56,7 +56,7 @@ def _platforms_list(raw: str) -> list[str] | None:
 async def _main(argv: list[str]) -> int:
     args = _parse_argv(argv)
 
-    from glitch_signal.onboarding.upload_post import generate_onboarding_url
+    from social_signal.onboarding.upload_post import generate_onboarding_url
 
     try:
         url = await generate_onboarding_url(

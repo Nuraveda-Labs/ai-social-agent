@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from glitch_signal.media.filename_parser import parse
+from social_signal.media.filename_parser import parse
 
 
 class TestProductExtraction:

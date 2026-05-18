@@ -1,6 +1,6 @@
 """Alembic environment — async SQLAlchemy.
 
-The database URL comes from glitch_signal.config.settings (which reads
+The database URL comes from social_signal.config.settings (which reads
 SIGNAL_DB_URL from .env). The static `sqlalchemy.url` in alembic.ini is
 only used as a fallback for offline mode on a fresh clone — production
 never hits it because the deployed .env is always present.
@@ -14,9 +14,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import SQLModel
 
 # Import all models so their metadata is registered
-import glitch_signal.db.models  # noqa: F401
+import social_signal.db.models  # noqa: F401
 from alembic import context
-from glitch_signal.config import settings
+from social_signal.config import settings
 
 config = context.config
 if config.config_file_name is not None:

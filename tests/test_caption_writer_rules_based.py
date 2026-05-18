@@ -17,7 +17,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -53,8 +53,8 @@ def _write_brand_with_catalog(tmp_path, brand_id, catalog_text):
 class TestRulesBasedRouting:
     @pytest.mark.asyncio
     async def test_parsed_filename_and_catalog_reach_llm(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal import config as cfg
+        from social_signal.agent.nodes import caption_writer as cw
 
         configs, catalog_path = _write_brand_with_catalog(
             tmp_path, "drive_test",
@@ -94,7 +94,7 @@ class TestRulesBasedPromptComposition:
         """Exercises the real _generate_via_rules_based body with a
         mocked litellm response — verifies the prompt sent to the LLM
         carries product, ad_num, geo, variant_group, and catalog text."""
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         catalog = tmp_path / "cat.md"
         catalog.write_text("# catalog\n- Liver Cleanse Tea\n- never claim cure")
@@ -112,7 +112,7 @@ class TestRulesBasedPromptComposition:
             return _FakeResp('{"title": "t", "caption": "c", "hashtags": ["x"]}')
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion",
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion",
             fake_acompletion,
         )
 
@@ -134,7 +134,7 @@ class TestRulesBasedPromptComposition:
 
     @pytest.mark.asyncio
     async def test_missing_catalog_logs_but_does_not_raise(self, tmp_path, monkeypatch):
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         async def fake_acompletion(**kwargs):
             class _M:
@@ -145,7 +145,7 @@ class TestRulesBasedPromptComposition:
                 choices = [_C()]
             return _R()
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion",
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion",
             fake_acompletion,
         )
 
@@ -160,7 +160,7 @@ class TestRulesBasedPromptComposition:
     async def test_unparseable_filename_still_generates(self, tmp_path, monkeypatch):
         """Even when the filename produces no product, the prompt must
         still be generated (with 'unparsed' signalled to the model)."""
-        from glitch_signal.agent.nodes import caption_writer as cw
+        from social_signal.agent.nodes import caption_writer as cw
 
         captured_messages = []
 
@@ -176,7 +176,7 @@ class TestRulesBasedPromptComposition:
             return _Resp()
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion",
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion",
             fake_acompletion,
         )
 

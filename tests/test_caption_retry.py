@@ -16,7 +16,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -48,7 +48,7 @@ class TestRetryOnTransient:
     async def test_service_unavailable_then_success(self, monkeypatch):
         import litellm
 
-        from glitch_signal.agent.nodes.caption_writer import _acompletion_with_retry
+        from social_signal.agent.nodes.caption_writer import _acompletion_with_retry
 
         calls = {"n": 0}
 
@@ -61,7 +61,7 @@ class TestRetryOnTransient:
             return _make_response('{"ok": true}')
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion", fake
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion", fake
         )
         resp = await _acompletion_with_retry(model="x", messages=[])
         assert resp.choices[0].message.content == '{"ok": true}'
@@ -71,7 +71,7 @@ class TestRetryOnTransient:
     async def test_rate_limit_retried(self, monkeypatch):
         import litellm
 
-        from glitch_signal.agent.nodes.caption_writer import _acompletion_with_retry
+        from social_signal.agent.nodes.caption_writer import _acompletion_with_retry
 
         calls = {"n": 0}
 
@@ -84,7 +84,7 @@ class TestRetryOnTransient:
             return _make_response("{}")
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion", fake
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion", fake
         )
         await _acompletion_with_retry(model="x", messages=[])
         assert calls["n"] == 2
@@ -94,7 +94,7 @@ class TestRetryOnTransient:
         """After 5 transient failures, the final exception bubbles."""
         import litellm
 
-        from glitch_signal.agent.nodes.caption_writer import _acompletion_with_retry
+        from social_signal.agent.nodes.caption_writer import _acompletion_with_retry
 
         calls = {"n": 0}
 
@@ -105,7 +105,7 @@ class TestRetryOnTransient:
             )
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion", fake
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion", fake
         )
         with pytest.raises(litellm.ServiceUnavailableError):
             await _acompletion_with_retry(model="x", messages=[])
@@ -116,7 +116,7 @@ class TestRetryOnTransient:
         """AuthError / BadRequest should propagate immediately — no retry."""
         import litellm
 
-        from glitch_signal.agent.nodes.caption_writer import _acompletion_with_retry
+        from social_signal.agent.nodes.caption_writer import _acompletion_with_retry
 
         calls = {"n": 0}
 
@@ -127,7 +127,7 @@ class TestRetryOnTransient:
             )
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion", fake
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion", fake
         )
         with pytest.raises(litellm.AuthenticationError):
             await _acompletion_with_retry(model="x", messages=[])
@@ -135,7 +135,7 @@ class TestRetryOnTransient:
 
     @pytest.mark.asyncio
     async def test_first_attempt_success_no_retry(self, monkeypatch):
-        from glitch_signal.agent.nodes.caption_writer import _acompletion_with_retry
+        from social_signal.agent.nodes.caption_writer import _acompletion_with_retry
 
         calls = {"n": 0}
 
@@ -144,7 +144,7 @@ class TestRetryOnTransient:
             return _make_response("{}")
 
         monkeypatch.setattr(
-            "glitch_signal.agent.nodes.caption_writer.litellm.acompletion", fake
+            "social_signal.agent.nodes.caption_writer.litellm.acompletion", fake
         )
         await _acompletion_with_retry(model="x", messages=[])
         assert calls["n"] == 1

@@ -1,4 +1,4 @@
-"""Smoke tests for Glitch Signal.
+"""Smoke tests for Social Signal.
 
 All tests use DISPATCH_MODE=dry_run and mock external API calls.
 These run without any network access or real credentials.
@@ -28,41 +28,41 @@ class TestGuardrails:
     """Pure rule engine — no network, no DB."""
 
     def test_hard_stop_legal(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, phrase = check("You're breaking SEC regulations!")
         assert not is_safe
         assert "SEC" in phrase
 
     def test_hard_stop_loss(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, phrase = check("I lost $500 trading with your bot")
         assert not is_safe
         assert phrase in ("loss", "lost $")
 
     def test_hard_stop_guarantee(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, _ = check("Can you guarantee returns of 20%?")
         assert not is_safe
 
     def test_hard_stop_lawsuit(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, phrase = check("I'm going to take legal action against you")
         assert not is_safe
 
     def test_safe_positive(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, phrase = check("Great bot! The cobra mascot is amazing.")
         assert is_safe
         assert phrase is None
 
     def test_safe_faq(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         is_safe, phrase = check("How do I get access to the trading platform?")
         assert is_safe
         assert phrase is None
 
     def test_case_insensitive(self):
-        from glitch_signal.orm.guardrails import check
+        from social_signal.orm.guardrails import check
         # "SEBI" in uppercase
         is_safe, _ = check("This violates sebi rules")
         assert not is_safe
@@ -77,7 +77,7 @@ class TestVideoRouter:
 
     @pytest.mark.asyncio
     async def test_dry_run_forces_mock(self):
-        from glitch_signal.agent.nodes.video_router import video_router_node
+        from social_signal.agent.nodes.video_router import video_router_node
 
         state = {
             "shots": [
@@ -93,7 +93,7 @@ class TestVideoRouter:
 
     @pytest.mark.asyncio
     async def test_empty_shots_returns_error(self):
-        from glitch_signal.agent.nodes.video_router import video_router_node
+        from social_signal.agent.nodes.video_router import video_router_node
 
         state = {"shots": []}
         result = await video_router_node(state)
@@ -107,8 +107,8 @@ class TestVideoRouter:
 class TestKlingMock:
     @pytest.mark.asyncio
     async def test_generate_dry_run(self):
-        from glitch_signal.video_models.base import VideoGenerationRequest
-        from glitch_signal.video_models.kling import KlingModel
+        from social_signal.video_models.base import VideoGenerationRequest
+        from social_signal.video_models.kling import KlingModel
 
         model = KlingModel()
         req = VideoGenerationRequest(prompt="cobra in neon city", duration_s=5)
@@ -120,7 +120,7 @@ class TestKlingMock:
 
     @pytest.mark.asyncio
     async def test_poll_dry_run(self):
-        from glitch_signal.video_models.kling import KlingModel
+        from social_signal.video_models.kling import KlingModel
 
         model = KlingModel()
         result = await model.poll("mock-abc123")
@@ -129,7 +129,7 @@ class TestKlingMock:
         assert result.video_url is not None
 
     def test_get_model_unknown_raises(self):
-        from glitch_signal.video_models.kling import get_model
+        from social_signal.video_models.kling import get_model
         with pytest.raises(ValueError, match="Unknown video model"):
             get_model("nonexistent_model")
 
@@ -156,7 +156,7 @@ class TestSchedulerVetoPromotion:
         factory = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
         # Create an expired pending_veto post
-        from glitch_signal.db.models import ScheduledPost, VideoAsset
+        from social_signal.db.models import ScheduledPost, VideoAsset
 
         now = datetime.now(UTC).replace(tzinfo=None)
         past = now - timedelta(seconds=1)
@@ -188,8 +188,8 @@ class TestSchedulerVetoPromotion:
         # Patch session factory in EVERY module that imported it as a bare
         # name at load time. Bindings are per-module in Python, so patching
         # db.session alone doesn't reach the scheduler's copy.
-        import glitch_signal.db.session as db_session
-        import glitch_signal.scheduler.queue as q
+        import social_signal.db.session as db_session
+        import social_signal.scheduler.queue as q
 
         def patched_factory():
             return factory
@@ -235,7 +235,7 @@ class TestPublisherIdempotencyGuard:
         from sqlmodel import SQLModel, select
         from sqlmodel.ext.asyncio.session import AsyncSession
 
-        from glitch_signal.db.models import PublishedPost, ScheduledPost, VideoAsset
+        from social_signal.db.models import PublishedPost, ScheduledPost, VideoAsset
 
         engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
         async with engine.begin() as conn:
@@ -274,8 +274,8 @@ class TestPublisherIdempotencyGuard:
             await session.commit()
 
         # Patch _session_factory in every module that bound it at import time.
-        import glitch_signal.agent.nodes.publisher as pub
-        import glitch_signal.db.session as db_session
+        import social_signal.agent.nodes.publisher as pub
+        import social_signal.db.session as db_session
 
         def patched_factory():
             return factory
@@ -321,7 +321,7 @@ class TestPublisherIdempotencyGuard:
 class TestClassifierDryRun:
     @pytest.mark.asyncio
     async def test_dry_run_returns_positive(self):
-        from glitch_signal.orm.classifier import classify
+        from social_signal.orm.classifier import classify
 
         result = await classify("Great bot! Love the cobra.", "twitter")
         assert result["tier"] == "positive"
@@ -341,8 +341,8 @@ class TestServerHealth:
         from sqlmodel import SQLModel
         from sqlmodel.ext.asyncio.session import AsyncSession
 
-        import glitch_signal.db.models  # noqa: F401 — register metadata
-        import glitch_signal.server as srv
+        import social_signal.db.models  # noqa: F401 — register metadata
+        import social_signal.server as srv
 
         engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
         async with engine.begin() as conn:
@@ -359,7 +359,7 @@ class TestServerHealth:
             srv._session_factory = original
 
         assert result["status"] == "ok"
-        assert result["service"] == "glitch-signal"
+        assert result["service"] == "social-signal"
         assert "queue" in result
 
 
@@ -369,18 +369,18 @@ class TestServerHealth:
 
 class TestConfig:
     def test_is_dry_run(self):
-        from glitch_signal.config import settings
+        from social_signal.config import settings
         s = settings()
         assert s.is_dry_run is True  # set at top of this file
 
     def test_brand_config_loads_defaults(self):
-        from glitch_signal.config import brand_config
+        from social_signal.config import brand_config
         bc = brand_config()
         assert bc["brand"]["accent_color"] == "#00ff88"
         assert bc["brand"]["base_color"] == "#0a0a0f"
         assert "hard_stop_phrases" in bc["orm_guardrails"]
 
     def test_github_repo_list(self):
-        from glitch_signal.config import Settings
+        from social_signal.config import Settings
         s = Settings(github_repos="glitch-cod-confirm,ai_marketing_stack-ads-agent")
         assert s.github_repo_list == ["glitch-cod-confirm", "ai_marketing_stack-ads-agent"]

@@ -22,7 +22,7 @@ X/Twitter, and LinkedIn.
 ## Layout
 
 ```
-src/glitch_signal/
+src/social_signal/
   agent/      # LangGraph nodes (scout, script, publish, ORM)
   db/         # SQLModel models + async engine
   publishers/ # YouTube + Instagram + X + LinkedIn clients

@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from glitch_signal.config import brand_config, settings  # noqa: E402
+from social_signal.config import brand_config, settings  # noqa: E402
 
 CONTENT_DIR = Path(__file__).resolve().parent / "ai_marketing_stack_launch"
 

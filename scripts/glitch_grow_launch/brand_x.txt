@@ -4,4 +4,4 @@ The gap = every Amazon order Meta can't see. PDPs don't carry the Meta pixel.
 
 We shipped the attribution model + autonomous action layer on AI Marketing Stack this week.
 
-gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent
+gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-ads-agent

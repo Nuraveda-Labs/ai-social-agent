@@ -26,7 +26,7 @@ os.environ.setdefault("AUTH_ENCRYPTION_KEY", "l3mgT3MDKZ2g8oh2l8r4e1XaS0o7Q8mT9H
 
 @pytest.fixture(autouse=True)
 def _reset_caches():
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
     yield
@@ -45,9 +45,9 @@ async def _build_test_db():
         await conn.run_sync(SQLModel.metadata.create_all)
     factory = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-    import glitch_signal.agent.nodes.publisher as pub
-    import glitch_signal.db.session as db_session
-    import glitch_signal.scheduler.queue as q
+    import social_signal.agent.nodes.publisher as pub
+    import social_signal.db.session as db_session
+    import social_signal.scheduler.queue as q
 
     def _getter():
         return factory
@@ -72,7 +72,7 @@ async def _seed_published(
 
     Returns (asset_path, transform_path_or_None).
     """
-    from glitch_signal.db.models import (
+    from social_signal.db.models import (
         PublishedPost,
         ScheduledPost,
         VideoAsset,
@@ -115,8 +115,8 @@ async def _seed_published(
 class TestCleanupWindow:
     @pytest.mark.asyncio
     async def test_deletes_after_window_elapsed(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "30")
         cfg.settings.cache_clear()
@@ -133,8 +133,8 @@ class TestCleanupWindow:
 
     @pytest.mark.asyncio
     async def test_keeps_inside_window(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "60")
         cfg.settings.cache_clear()
@@ -150,8 +150,8 @@ class TestCleanupWindow:
 
     @pytest.mark.asyncio
     async def test_zero_window_disables_cleanup(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "0")
         cfg.settings.cache_clear()
@@ -168,8 +168,8 @@ class TestCleanupWindow:
     @pytest.mark.asyncio
     async def test_idempotent(self, tmp_path, monkeypatch):
         """Running twice doesn't raise even though file is already gone."""
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "1")
         cfg.settings.cache_clear()
@@ -187,8 +187,8 @@ class TestCleanupWindow:
     @pytest.mark.asyncio
     async def test_missing_file_noop(self, tmp_path, monkeypatch):
         """If the file was already removed manually, cleanup is a no-op."""
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "1")
         cfg.settings.cache_clear()
@@ -207,8 +207,8 @@ class TestCleanupWindow:
 class TestTransformSiblings:
     @pytest.mark.asyncio
     async def test_strip_audio_sibling_also_deleted(self, tmp_path, monkeypatch):
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "1")
         cfg.settings.cache_clear()
@@ -231,8 +231,8 @@ class TestTransformSiblings:
         """A file sharing the stem but with an unknown middle segment
         (e.g. .backup.mp4) must NOT be deleted — only known transform
         names are in scope."""
-        from glitch_signal import config as cfg
-        from glitch_signal.scheduler import queue as q
+        from social_signal import config as cfg
+        from social_signal.scheduler import queue as q
 
         monkeypatch.setenv("MEDIA_CLEANUP_AFTER_MINUTES", "1")
         cfg.settings.cache_clear()
@@ -255,13 +255,13 @@ class TestJITDownload:
     @pytest.mark.asyncio
     async def test_noop_when_file_already_exists(self, tmp_path, monkeypatch):
         """If the file is already on disk, no Drive call is made."""
-        from glitch_signal.agent.nodes.publisher import _ensure_local_file
-        from glitch_signal.db.models import VideoAsset
+        from social_signal.agent.nodes.publisher import _ensure_local_file
+        from social_signal.db.models import VideoAsset
 
         async def must_not_download(*a, **kw):
             raise AssertionError("Drive download must not run when file exists")
         monkeypatch.setattr(
-            "glitch_signal.integrations.google_drive.download_file",
+            "social_signal.integrations.google_drive.download_file",
             must_not_download,
         )
 
@@ -275,8 +275,8 @@ class TestJITDownload:
 
     @pytest.mark.asyncio
     async def test_downloads_when_missing(self, tmp_path, monkeypatch):
-        from glitch_signal.agent.nodes.publisher import _ensure_local_file
-        from glitch_signal.db.models import ContentScript, Signal, VideoAsset
+        from social_signal.agent.nodes.publisher import _ensure_local_file
+        from social_signal.db.models import ContentScript, Signal, VideoAsset
 
         factory, originals = await _build_test_db()
         try:
@@ -309,7 +309,7 @@ class TestJITDownload:
                 dest.write_bytes(b"fresh bytes")
                 return len(b"fresh bytes")
             monkeypatch.setattr(
-                "glitch_signal.integrations.google_drive.download_file",
+                "social_signal.integrations.google_drive.download_file",
                 fake_download,
             )
 
@@ -322,8 +322,8 @@ class TestJITDownload:
     @pytest.mark.asyncio
     async def test_raises_when_no_drive_source(self, tmp_path, monkeypatch):
         """A file that's missing AND has no Drive source_ref can't be recovered."""
-        from glitch_signal.agent.nodes.publisher import _ensure_local_file
-        from glitch_signal.db.models import ContentScript, Signal, VideoAsset
+        from social_signal.agent.nodes.publisher import _ensure_local_file
+        from social_signal.db.models import ContentScript, Signal, VideoAsset
 
         factory, originals = await _build_test_db()
         try:

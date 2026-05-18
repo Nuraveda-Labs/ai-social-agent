@@ -18,7 +18,7 @@ import asyncio
 import os
 from datetime import UTC, datetime, timedelta
 
-from glitch_signal.oauth import storage
+from social_signal.oauth import storage
 
 
 async def seed_x(brand_id: str, prefix: str) -> None:

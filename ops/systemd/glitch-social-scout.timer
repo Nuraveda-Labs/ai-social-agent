@@ -1,5 +1,5 @@
 [Unit]
-Description=Glitch Social scout — fires every 4 hours to discover new signals
+Description=AI Social scout — fires every 4 hours to discover new signals
 Requires=ai-social-scout.service
 
 [Timer]

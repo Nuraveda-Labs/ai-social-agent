@@ -4,6 +4,6 @@ Since: 17+ repos, 3 product lines, voice AI in production, 9-model trading ensem
 
 One pattern: no single model wins. Coordinated ensembles do.
 
-github.com/glitch-exec-labs
+github.com/<your-org>
 
-#buildinpublic #glitchexecutor
+#buildinpublic #example

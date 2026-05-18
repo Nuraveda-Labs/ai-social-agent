@@ -20,10 +20,10 @@ Edge — cricket and NBA intelligence engines, plus a bilingual Hindi/English vo
 
 Grow — a Meta-to-Amazon attribution bridge recovering the 60% of Meta-driven purchases that land on Amazon and are invisible to the Shopify pixel.
 
-Everything we build is public. github.com/glitch-exec-labs
+Everything we build is public. github.com/<your-org>
 
 This page will document what we ship, what we decide, and what we get wrong. We build in the open because the genuinely novel work deserves to be seen, and because the mistakes are as useful as the wins.
 
 If you build production AI, or care about what production actually looks like — we'd like you here.
 
-#buildinpublic #glitchexecutor #ai #algotrading #ecommerce
+#buildinpublic #example #ai #algotrading #ecommerce

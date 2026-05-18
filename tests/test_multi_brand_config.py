@@ -22,7 +22,7 @@ def _reset_registry():
     after each test — otherwise monkeypatched env vars leak into subsequent
     tests via the lru_cache on settings().
     """
-    from glitch_signal import config as cfg
+    from social_signal import config as cfg
 
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
@@ -59,7 +59,7 @@ class TestMultiBrandLoader:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
 
         cfg.settings.cache_clear()  # pick up the new env
         cfg._reset_brand_registry_for_tests()
@@ -88,7 +88,7 @@ class TestMultiBrandLoader:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "something_else")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
 
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
@@ -104,7 +104,7 @@ class TestMultiBrandLoader:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
 
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
@@ -120,7 +120,7 @@ class TestMultiBrandLoader:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
 
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
@@ -138,7 +138,7 @@ class TestMultiBrandLoader:
         monkeypatch.setenv("BRAND_CONFIG_PATH", str(tmp_path / "nope.json"))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
+        from social_signal import config as cfg
 
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
@@ -177,8 +177,8 @@ class TestBrandScopedGuardrails:
         monkeypatch.setenv("BRAND_CONFIGS_DIR", str(configs))
         monkeypatch.setenv("DEFAULT_BRAND_ID", "glitch_executor")
 
-        from glitch_signal import config as cfg
-        from glitch_signal.orm import guardrails
+        from social_signal import config as cfg
+        from social_signal.orm import guardrails
 
         cfg.settings.cache_clear()
         cfg._reset_brand_registry_for_tests()
@@ -200,7 +200,7 @@ class TestModelsCarryBrandId:
     """SQLModel fields must include brand_id on every brand-scoped table."""
 
     def test_models_have_brand_id_field(self):
-        from glitch_signal.db.models import (
+        from social_signal.db.models import (
             ContentScript,
             MentionEvent,
             MetricsSnapshot,

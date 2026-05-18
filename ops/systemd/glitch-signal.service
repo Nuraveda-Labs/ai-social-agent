@@ -1,5 +1,5 @@
 [Unit]
-Description=Glitch Social Media Agent — autonomous social video + ORM agent
+Description=AI Social Agent — autonomous social video + ORM agent
 After=network.target postgresql.service
 Wants=postgresql.service
 

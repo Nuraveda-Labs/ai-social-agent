@@ -24,8 +24,8 @@ os.environ.setdefault("TIKTOK_CLIENT_SECRET", "test_client_secret")
 @pytest.fixture(autouse=True)
 def _reset_registry_and_cache():
     """Clear caches before and after each test so env changes apply."""
-    from glitch_signal import config as cfg
-    from glitch_signal import crypto as cr
+    from social_signal import config as cfg
+    from social_signal import crypto as cr
 
     cfg._reset_brand_registry_for_tests()
     cfg.settings.cache_clear()
@@ -42,27 +42,27 @@ def _reset_registry_and_cache():
 
 class TestCrypto:
     def test_encrypt_decrypt_round_trip(self):
-        from glitch_signal import crypto
+        from social_signal import crypto
         secret = "tiktok-refresh-token-xyz"
         ct = crypto.encrypt(secret)
         assert ct != secret
         assert crypto.decrypt(ct) == secret
 
     def test_state_token_round_trip(self):
-        from glitch_signal import crypto
+        from social_signal import crypto
         token = crypto.make_state_token({"b": "drive_brand", "p": "tiktok"})
         payload = crypto.verify_state_token(token)
         assert payload == {"b": "drive_brand", "p": "tiktok"}
 
     def test_state_token_tampered_signature_rejected(self):
-        from glitch_signal import crypto
+        from social_signal import crypto
         token = crypto.make_state_token({"b": "drive_brand", "p": "tiktok"})
         tampered = token[:-4] + "AAAA"
         with pytest.raises(ValueError, match="signature"):
             crypto.verify_state_token(tampered)
 
     def test_state_token_expiry_rejected(self):
-        from glitch_signal import crypto
+        from social_signal import crypto
         token = crypto.make_state_token({"b": "drive_brand"}, ttl_s=-1)
         with pytest.raises(ValueError, match="expired"):
             crypto.verify_state_token(token)
@@ -74,7 +74,7 @@ class TestCrypto:
 
 class TestTikTokOAuth:
     def test_build_authorize_url_has_expected_params(self):
-        from glitch_signal.oauth.tiktok import build_authorize_url
+        from social_signal.oauth.tiktok import build_authorize_url
 
         url = build_authorize_url("drive_brand")
         assert url.startswith("https://www.tiktok.com/v2/auth/authorize/?")
@@ -85,15 +85,15 @@ class TestTikTokOAuth:
         assert "state=" in url
 
     def test_parse_state_accepts_tiktok_platform(self):
-        from glitch_signal.crypto import make_state_token
-        from glitch_signal.oauth.tiktok import parse_state
+        from social_signal.crypto import make_state_token
+        from social_signal.oauth.tiktok import parse_state
 
         token = make_state_token({"b": "drive_brand", "p": "tiktok"})
         assert parse_state(token) == "drive_brand"
 
     def test_parse_state_rejects_wrong_platform(self):
-        from glitch_signal.crypto import make_state_token
-        from glitch_signal.oauth.tiktok import parse_state
+        from social_signal.crypto import make_state_token
+        from social_signal.oauth.tiktok import parse_state
 
         token = make_state_token({"b": "drive_brand", "p": "facebook"})
         with pytest.raises(ValueError, match="platform mismatch"):
@@ -115,13 +115,13 @@ class TestPlanChunks:
     MB = 1024 * 1024
 
     def test_single_chunk_under_64mb(self):
-        from glitch_signal.platforms.tiktok import _plan_chunks
+        from social_signal.platforms.tiktok import _plan_chunks
         cs, n = _plan_chunks(10 * self.MB)
         assert n == 1
         assert cs == 10 * self.MB
 
     def test_single_chunk_exactly_64mb(self):
-        from glitch_signal.platforms.tiktok import _plan_chunks
+        from social_signal.platforms.tiktok import _plan_chunks
         cs, n = _plan_chunks(64 * self.MB)
         assert n == 1
         assert cs == 64 * self.MB
@@ -130,7 +130,7 @@ class TestPlanChunks:
         # The real-world bug: 82.7 MB / 10 MB chunks yielded 9 chunks with
         # a 2.66 MB final chunk (< 5 MB floor). Correct plan: 8 chunks,
         # chunk_size 10 MB, final chunk = file_size - 7*10 MB = 12.66 MB.
-        from glitch_signal.platforms.tiktok import _plan_chunks
+        from social_signal.platforms.tiktok import _plan_chunks
         file_size = 86683219   # 82.7 MB — an 82 MB file
         cs, n = _plan_chunks(file_size)
         assert n == 8
@@ -141,7 +141,7 @@ class TestPlanChunks:
     def test_final_chunk_always_between_5_and_64_mb(self):
         # Exhaustive sanity: any file size between 64 MB (exclusive) and
         # 640 MB (past any realistic video) must plan to a valid final chunk.
-        from glitch_signal.platforms.tiktok import _plan_chunks
+        from social_signal.platforms.tiktok import _plan_chunks
         for fs_mb in range(65, 640, 3):
             fs = fs_mb * self.MB
             cs, n = _plan_chunks(fs)
@@ -158,7 +158,7 @@ class TestPlanChunks:
 class TestTikTokPublisher:
     @pytest.mark.asyncio
     async def test_dry_run_returns_fake_id_and_no_http(self):
-        from glitch_signal.platforms import tiktok
+        from social_signal.platforms import tiktok
 
         # DISPATCH_MODE=dry_run from module env setup above.
         publish_id, url = await tiktok.publish(
@@ -171,8 +171,8 @@ class TestTikTokPublisher:
 
     @pytest.mark.asyncio
     async def test_live_mode_requires_brand_id(self, monkeypatch):
-        from glitch_signal import config
-        from glitch_signal.platforms import tiktok
+        from social_signal import config
+        from social_signal.platforms import tiktok
 
         monkeypatch.setenv("DISPATCH_MODE", "live")
         config.settings.cache_clear()
@@ -192,7 +192,7 @@ class TestTikTokPublisher:
 class TestTokenExchangeAndPersist:
     @pytest.mark.asyncio
     async def test_exchange_code_happy_path(self):
-        from glitch_signal.oauth import tiktok as oauth
+        from social_signal.oauth import tiktok as oauth
 
         fake_resp = _FakeResponse(
             200,
@@ -205,7 +205,7 @@ class TestTokenExchangeAndPersist:
             },
         )
 
-        with patch("glitch_signal.oauth.tiktok.httpx.AsyncClient") as mock_client:
+        with patch("social_signal.oauth.tiktok.httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.post = AsyncMock(return_value=fake_resp)
             tokens = await oauth.exchange_code_for_tokens("dummy_code")
 
@@ -214,11 +214,11 @@ class TestTokenExchangeAndPersist:
 
     @pytest.mark.asyncio
     async def test_exchange_code_raises_on_provider_error(self):
-        from glitch_signal.oauth import tiktok as oauth
+        from social_signal.oauth import tiktok as oauth
 
         fake_resp = _FakeResponse(400, {"error": "invalid_grant"})
 
-        with patch("glitch_signal.oauth.tiktok.httpx.AsyncClient") as mock_client:
+        with patch("social_signal.oauth.tiktok.httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.post = AsyncMock(return_value=fake_resp)
             with pytest.raises(RuntimeError, match="token exchange failed"):
                 await oauth.exchange_code_for_tokens("dummy_code")

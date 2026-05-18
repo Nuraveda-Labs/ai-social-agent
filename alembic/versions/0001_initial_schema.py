@@ -1,4 +1,4 @@
-"""Initial schema — all Glitch Signal tables.
+"""Initial schema — all Social Signal tables.
 
 Revision ID: 0001
 Revises:
