@@ -1,0 +1,7 @@
+Shipped today: ad agent proposes budget changes in Telegram with reasoning attached.
+
++30% bump on an ad set. Proposal: 14d spend ₹65K, ROAS 1.24×, +₹24.5K/mo expected, auto-revert below 1.0×.
+
+I approve. Done.
+
+gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent

@@ -1,0 +1,13 @@
+[Unit]
+Description=Glitch Social scout — fires every 4 hours to discover new signals
+Requires=ai-social-scout.service
+
+[Timer]
+# Fire at 01:20, 05:20, 09:20, 13:20, 17:20, 21:20 UTC. Offset by 20 min
+# so scout doesn't clash with ads planner (which runs at :15).
+OnCalendar=*-*-* 01,05,09,13,17,21:20:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

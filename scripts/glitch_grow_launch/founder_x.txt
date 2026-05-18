@@ -1,0 +1,7 @@
+Yesterday my ads agent proposed its first real budget change.
+
+Client tapped Approve in Telegram. Meta API updated 4 minutes later.
+
+Closing the loop — measurement → proposal → approval → execution — was the hard part.
+
+gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent

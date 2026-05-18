@@ -1,0 +1,29 @@
+Two months ago — February 15 — I started building this project.
+
+Since then: 17+ production repositories, three live product lines, a voice AI running in production, a 9-model trading ensemble, and sports intelligence engines for cricket and NBA.
+
+That sounds like a list designed to impress. It's actually the consequence of one realization I had early on, and kept testing.
+
+The realization: no single AI model wins across all conditions. Coordinated ensembles do.
+
+I found it in trading first. A momentum strategy prints in trending markets and gets destroyed in ranging ones. Mean reversion does the opposite. I stopped trying to pick the right model and started coordinating many of them under an Oracle layer that sees the whole portfolio.
+
+Then I noticed the same shape of problem in sports pricing.
+
+Then in ad attribution.
+
+Then in e-commerce ops.
+
+Every time I tested it, the pattern held. So I kept applying it.
+
+That's why three product lines exist. They're not unrelated bets. They're the same bet tested in three different markets.
+
+The honest version of where we are at two months in: some of this is live and performing. Some is active and I'm still figuring out the edge. None of it is "results guaranteed."
+
+The part I find most interesting: the coordination layer is always the hard part. The individual models are commodities now. The Oracle — the thing that sees the whole picture — is where the actual work lives.
+
+Starting to post here about decisions, lessons, and what building this at this pace actually looks like. Not the highlight reel.
+
+Everything is public: github.com/glitch-exec-labs
+
+#buildinpublic #glitchexecutor #ai #founder #algotrading

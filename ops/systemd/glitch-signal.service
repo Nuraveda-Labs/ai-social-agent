@@ -1,0 +1,27 @@
+[Unit]
+Description=Glitch Social Media Agent — autonomous social video + ORM agent
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=support
+Group=support
+WorkingDirectory=.
+EnvironmentFile=./.env
+ExecStart=./.venv/bin/uvicorn glitch_signal.server:app --host 127.0.0.1 --port 3111
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=glitch-signal
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=. /var/lib/glitch-signal
+
+[Install]
+WantedBy=multi-user.target

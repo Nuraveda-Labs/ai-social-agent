@@ -1,0 +1,17 @@
+Yesterday my ads agent proposed its first real budget change on a live client.
+
+The client tapped Approve in Telegram. Meta API updated 4 minutes later.
+
+I've been building for 48 hours straight. The unlock wasn't any single piece shipping. It was watching all of them connect on one live account.
+
+What I shipped: autonomous action layer on Meta, sessions-delta attribution for brands the Amazon API won't talk to, LWA OAuth pipeline end-to-end, two founder-ready PDF reports for my first client.
+
+What I'm not proud of: /roas was reporting 3.67× because I was summing five duplicate Meta action_type aliases. Client caught it against their dashboard. Real was 1.22× from canonical omni_purchase. Fixed same day.
+
+The lesson I keep landing on: full autonomy on money decisions is too risky when attribution is noisy. The middle path is an agent that watches and reasons, and asks a human for exactly one thing — the go-ahead.
+
+Full breakdown in the carousel below.
+
+gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent
+
+#buildinpublic #ecommerce #founder #adsops

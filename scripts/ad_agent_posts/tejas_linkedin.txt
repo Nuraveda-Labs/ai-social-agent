@@ -1,0 +1,27 @@
+While people are still figuring out how to connect Facebook Ads to Claude, my agent just ported a live Meta ad onto TikTok by itself.
+
+I never opened Meta Ads Manager.
+I never opened TikTok Ads Manager.
+I didn't copy a single creative.
+
+What I did:
+
+I told the agent, in plain English, to mirror our live Meta ad onto TikTok.
+
+It read the Meta account, pulled the creative, picked the right pixel event, and posted a Discord card on my phone — *"want me to mirror this onto example's TikTok at $50/day, DISABLED on create?"*
+
+I tapped approve once.
+
+Twenty seconds later: a new TikTok campaign, ad group, and ad — uploaded, mapped, all in DISABLED state. Followed by a second Discord message: *"ready to enable when you are."*
+
+Total human time: under thirty seconds.
+
+I'm one person. There is no team behind this. The whole thing runs on a single GCE box.
+
+The reason most "AI in ads" demos stop at an MCP server and a read-only API call is that nobody has solved the writes. Reads are easy. Writes are where money moves, attribution gets noisy, and a runaway agent becomes a real problem. The unlock isn't more autonomy. It's the agent doing the long, technical work — fetching, mapping, building — and asking the human for the one decision that actually matters: approve?
+
+Same shape as the Oracle in my trading stack.
+Same shape as the 48-hour approval window on my social agent.
+I keep ending up here because it keeps working.
+
+#buildinpublic #glitchexecutor #metaads #tiktokads #adops

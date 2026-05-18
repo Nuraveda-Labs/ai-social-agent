@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff
+        run: ruff check src/ tests/
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests
+        env:
+          DISPATCH_MODE: dry_run
+          SIGNAL_DB_URL: sqlite+aiosqlite:///./test.db
+          ANTHROPIC_API_KEY: test-key
+          GOOGLE_API_KEY: test-key
+          KLING_API_KEY: test-key
+          TELEGRAM_BOT_TOKEN_SIGNAL: "0:test"
+          TELEGRAM_ADMIN_IDS: "12345"
+          GITHUB_TOKEN: test-token
+        run: pytest tests/ -v --tb=short

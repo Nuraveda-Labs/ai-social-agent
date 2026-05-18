@@ -1,0 +1,12 @@
+# Pre-commit hooks for secret scanning.
+# Install locally with: pre-commit install
+# Runs gitleaks on staged files at commit time and blocks commits that contain
+# API keys, tokens, private keys, or other secrets.
+#
+# To bypass in a true emergency: git commit --no-verify (avoid this).
+# To update hook versions: pre-commit autoupdate
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks

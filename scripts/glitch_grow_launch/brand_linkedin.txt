@@ -1,0 +1,19 @@
+Meta dashboard says 1.22× ROAS on a client. Our sessions-delta model reads 1.57×.
+
+The gap is every Amazon order Meta can't see. Amazon PDPs don't carry the Meta pixel, so a click-to-Amazon-purchase looks like a failure on the Meta dashboard.
+
+What we shipped on AI Marketing Stack this week:
+
+— Autonomous action layer: agent scans Meta adsets every 4h, proposes pause/scale into a Telegram group. Approved actions execute via glitch-ads-mcp within 5 minutes. Rollback window 72h.
+
+— Sessions-delta attribution for brands locked out of the Amazon Attribution API (India-only brand registry).
+
+— Amazon LWA OAuth pipeline end-to-end. Awaiting Amazon Partner Network approval to enable live writes.
+
+— /roas bug fix: was summing five duplicate Meta action_type aliases and reporting 3.67×. Client caught it against their dashboard. Real: 1.22× from canonical omni_purchase. Fixed same day.
+
+Full breakdown in the carousel.
+
+gitlab.com/glitch-grow/ai-social-agent_marketing_stack-ai-ads-agent
+
+#buildinpublic #ecommerce #adsops #metaads

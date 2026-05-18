@@ -1,0 +1,56 @@
+name: Feature Request
+description: Suggest a new capability or improvement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a feature request, check the [Phase 2 / Phase 3 roadmap](../../README.md#roadmap) — it may already be planned.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Scout (signal discovery)
+        - Video pipeline (script / storyboard / generation / assembly)
+        - Video model (Kling / Runway / Veo / Hailuo)
+        - Platform (YouTube / X / Instagram)
+        - ORM (monitor / classify / respond)
+        - Telegram bot
+        - Scheduler
+        - Configuration / brand.config
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem you're solving
+      description: What's the limitation or gap today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How would you implement or use this?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have checked the roadmap in README
+          required: true
+        - label: I have searched existing issues for duplicates
+          required: true

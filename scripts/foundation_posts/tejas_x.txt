@@ -1,0 +1,9 @@
+2 months ago I started this project.
+
+Since: 17+ repos, 3 product lines, voice AI in production, 9-model trading ensemble, sports intelligence engines.
+
+One pattern: no single model wins. Coordinated ensembles do.
+
+github.com/glitch-exec-labs
+
+#buildinpublic #glitchexecutor

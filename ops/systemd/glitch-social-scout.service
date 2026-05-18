@@ -1,0 +1,26 @@
+[Unit]
+Description=Glitch Social Media Agent — periodic scout trigger for ai_generated text brands
+After=ai-social-media-agent.service
+Requires=ai-social-media-agent.service
+
+[Service]
+Type=oneshot
+# Fire one scout run per ai_generated text brand. The /jobs/scout endpoint
+# returns immediately and processes in the background; back-to-back calls
+# are safe because the LangGraph graph is per-invocation state.
+ExecStart=/usr/bin/curl -sS -X POST http://127.0.0.1:3111/jobs/scout \
+  -H 'Content-Type: application/json' \
+  -d '{"brand_id":"glitch_executor"}'
+ExecStart=/usr/bin/curl -sS -X POST http://127.0.0.1:3111/jobs/scout \
+  -H 'Content-Type: application/json' \
+  -d '{"brand_id":"glitch_founder"}'
+
+# Non-zero exit from curl (localhost + POST to FastAPI is 200 OK by design)
+# should surface as a service failure so journalctl flags it.
+SuccessExitStatus=0
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true

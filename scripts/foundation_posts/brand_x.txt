@@ -1,0 +1,9 @@
+You've seen the trading bots — that was ~20% of what we've been building.
+
+Trading ensembles. Sports intelligence. Voice AI. Ad attribution.
+
+One pattern: coordinated ensembles > single models.
+
+github.com/glitch-exec-labs
+
+#buildinpublic #glitchexecutor
