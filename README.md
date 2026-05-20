@@ -66,6 +66,18 @@ In production they're orchestrated by **[Mesh Pilot](https://meshpilot.app)** �
 - GitLab: [`mesh-pilot/ai-social-agent`](https://gitlab.com/mesh-pilot/ai-social-agent)
 - Codeberg: [`Glitch_Exec_Lab/ai-social-agent`](https://codeberg.org/Glitch_Exec_Lab/ai-social-agent)
 
+## Contributing
+
+Bug reports + PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution shape (issue-first for non-trivial changes, preserve the HITL gate, conventional commits).
+
+## Security
+
+Security reports go to `support@meshpilot.app` — see [SECURITY.md](SECURITY.md). Please do not open public issues for vulnerabilities.
+
+## Code of conduct
+
+Be kind, stay on scope — see [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+
 ## License
 
 [MIT](LICENSE) — fork it, ship products with it, no attribution required.

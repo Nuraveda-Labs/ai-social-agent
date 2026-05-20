@@ -1,71 +1,38 @@
-# Contributing to AI Social Agent
+# Contributing to AI social Agent
 
-Thanks for your interest. This is a build-in-public project — contributions that improve the open-source engine are welcome.
+Thanks for thinking about contributing. This agent is one of six in the open-source [Mesh Pilot](https://meshpilot.app) marketing stack, and we welcome PRs that fit its scope: multi-platform social posting and ORM with a human-in-the-loop approval gate before publish.
 
-## What's in scope
+## Ways to contribute
 
-- Bug fixes in the video pipeline, scheduler, ORM, or platform integrations
-- New video model clients (`src/social_signal/video_models/`)
-- New platform publishers (`src/social_signal/platforms/`)
-- Performance improvements to the scheduler or assembler
-- Test coverage improvements
+- **Bug reports** — open an issue on either mirror (GitLab is primary; Codeberg syncs nightly). Include the integration involved (YouTube / Instagram / X / LinkedIn / video providers), the action that failed, and any redacted log output.
+- **New integrations** — adding a new provider? Match the existing adapter pattern. Anything that creates an external side effect must surface a proposal through the human-in-the-loop gate before it executes.
+- **Pipeline improvements** — keep the proposal → approval → execute → audit chain intact. The HITL gate is the moat.
+- **Documentation** — README clarifications, runnable examples, integration recipes.
 
-## What's out of scope
+## Before you open a PR
 
-- Changes to brand voice, guardrail phrases, or watermark assets (these live in the private `brand.config.json`)
-- Scope creep beyond short-form video + ORM
+1. **Open an issue first** for anything beyond a one-line fix.
+2. **Preserve the HITL gate.** Any new action must route through an approval surface (Discord by default; web inbox in the Mesh Pilot cockpit). No PRs that bypass it.
+3. **Add tests** for new actions and state-machine nodes.
+4. **Format + lint** before committing.
+5. **One concern per PR.**
 
-## Setup
-
-```bash
-git clone https://gitlab.com/ai-marketing-stack/ai-social-agent_marketing_stack-ai-social-media-agent
-cd ai_marketing_stack-ai-social-media-agent
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-```
-
-## Run tests (no API keys needed)
+## Development setup
 
 ```bash
-DISPATCH_MODE=dry_run pytest tests/ -v
+git clone https://gitlab.com/mesh-pilot/ai-social-agent.git
+cd ai-social-agent
+# follow the README quick-start
 ```
-
-## Lint
-
-```bash
-ruff check src/ tests/
-```
-
-## Adding a video model
-
-1. Create `src/social_signal/video_models/{model_name}.py`
-2. Implement the `VideoModel` ABC from `video_models/base.py`:
-   - `generate(req: VideoGenerationRequest) -> VideoGenerationResult`
-   - `poll(api_job_id: str) -> VideoGenerationResult`
-3. Register it in `get_model()` in `video_models/kling.py` (or extract to a factory)
-4. Add a model_hint entry to `brand.config.example.json`
-5. Add dry-run path (return mock result when `DISPATCH_MODE=dry_run`)
-6. Add tests
-
-## Adding a platform
-
-1. Create `src/social_signal/platforms/{platform}.py`
-2. Implement `upload(asset_path, metadata) -> str` (returns platform post ID)
-3. Wire into `agent/nodes/publisher.py`
-4. Document required env vars in `.env.example`
 
 ## Commit style
 
-```
-type: short description (≤72 chars)
+Conventional commits. Examples: `feat(...)`, `fix(...)`, `docs(...)`.
 
-Optional body. Explain why, not what.
-```
+## License
 
-Types: `fix`, `feat`, `refactor`, `test`, `docs`, `chore`
+By contributing you agree your contributions are licensed under [MIT](LICENSE).
 
-## Pull requests
+## Questions
 
-- One logical change per PR
-- All CI checks must pass
-- No credentials in diff — ever
+Open an issue. For private inquiries: `support@meshpilot.app`.
