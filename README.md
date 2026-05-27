@@ -2,7 +2,8 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-black.svg)](LICENSE)
 [![Part of Mesh Pilot](https://img.shields.io/badge/Mesh%20Pilot-stack-black.svg)](https://meshpilot.app)
-[![Mirrored on Codeberg](https://img.shields.io/badge/codeberg-mirror-black.svg)](https://codeberg.org/Glitch_Exec_Lab/ai-social-agent)
+[![Open on GitHub](https://img.shields.io/badge/github-Nuraveda--Labs-black.svg)](https://github.com/Nuraveda-Labs/ai-social-agent)
+[![Mirrored on Codeberg](https://img.shields.io/badge/codeberg-mirror-black.svg)](https://codeberg.org/Nuraveda_lab/ai-social-agent)
 
 > **Part of the [Mesh Pilot](https://meshpilot.app) open-source 6-agent marketing stack.**
 > Autonomous short-form social posting + online-reputation management across YouTube Shorts, Instagram Reels, X/Twitter, and LinkedIn — with a human-in-the-loop approval gate before anything goes public.
@@ -12,8 +13,8 @@ The agent scans configured signal sources, drafts a caption + script tuned to ea
 ## Quick start
 
 ```bash
-git clone https://gitlab.com/mesh-pilot/ai-social-agent.git
-# or: git clone https://codeberg.org/Glitch_Exec_Lab/ai-social-agent.git
+git clone https://gitlab.com/nuraveda-lab/ai-social-agent.git
+# or: git clone https://codeberg.org/Nuraveda_lab/ai-social-agent.git
 cd ai-social-agent
 
 uv pip install -e .          # or: pip install -e .
@@ -52,19 +53,19 @@ ops/          # systemd unit templates
 
 | Agent | Domain | Repo |
 |---|---|---|
-| AI Ads Agent | Meta / Google / TikTok / Amazon Ads | [mesh-pilot/ai-ads-agent](https://gitlab.com/mesh-pilot/ai-ads-agent) |
-| AI Sales Agent | Outbound B2B sales | [mesh-pilot/ai-sales-agent](https://gitlab.com/mesh-pilot/ai-sales-agent) |
+| AI Ads Agent | Meta / Google / TikTok / Amazon Ads | [mesh-pilot/ai-ads-agent](https://gitlab.com/nuraveda-lab/ai-ads-agent) |
+| AI Sales Agent | Outbound B2B sales | [mesh-pilot/ai-sales-agent](https://gitlab.com/nuraveda-lab/ai-sales-agent) |
 | **AI Social Agent** | This repo | — |
-| AI UGC Agent | Vertical video ad pipeline | [mesh-pilot/ai-ugc-agent](https://gitlab.com/mesh-pilot/ai-ugc-agent) |
-| AI Voice Agent | LiveKit-based phone agent | [mesh-pilot/ai-voice-agent](https://gitlab.com/mesh-pilot/ai-voice-agent) |
-| AI SEO Agent | Shopify SEO autopilot | [mesh-pilot/ai-seo-agent](https://gitlab.com/mesh-pilot/ai-seo-agent) |
+| AI UGC Agent | Vertical video ad pipeline | [mesh-pilot/ai-ugc-agent](https://gitlab.com/nuraveda-lab/ai-ugc-agent) |
+| AI Voice Agent | LiveKit-based phone agent | [mesh-pilot/ai-voice-agent](https://gitlab.com/nuraveda-lab/ai-voice-agent) |
+| AI SEO Agent | Shopify SEO autopilot | [mesh-pilot/ai-seo-agent](https://gitlab.com/nuraveda-lab/ai-seo-agent) |
 
 In production they're orchestrated by **[Mesh Pilot](https://meshpilot.app)** — the closed-source cockpit that runs all six in concert with shared brand context, a single web approval inbox, and cross-agent handoffs.
 
 ## Mirrors
 
-- GitLab: [`mesh-pilot/ai-social-agent`](https://gitlab.com/mesh-pilot/ai-social-agent)
-- Codeberg: [`Glitch_Exec_Lab/ai-social-agent`](https://codeberg.org/Glitch_Exec_Lab/ai-social-agent)
+- GitLab: [`mesh-pilot/ai-social-agent`](https://gitlab.com/nuraveda-lab/ai-social-agent)
+- Codeberg: [`Glitch_Exec_Lab/ai-social-agent`](https://codeberg.org/Nuraveda_lab/ai-social-agent)
 
 ## Contributing
 
